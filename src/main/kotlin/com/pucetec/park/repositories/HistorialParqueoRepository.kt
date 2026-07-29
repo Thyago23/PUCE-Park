@@ -6,4 +6,6 @@ import java.util.Optional
 
 interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
     fun findFirstByPuestoIdAndFechaSalidaIsNullOrderByFechaIngresoDesc(puestoId: Long): Optional<HistorialParqueo>
+    fun findByUsernameOrderByFechaIngresoDesc(username: String): List<HistorialParqueo>
+    fun findByPuestoIdOrderByFechaIngresoDesc(puestoId: Long): List<HistorialParqueo>
 }

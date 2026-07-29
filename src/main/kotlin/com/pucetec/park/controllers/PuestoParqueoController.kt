@@ -2,6 +2,7 @@ package com.pucetec.park.controllers
 
 import com.pucetec.park.dto.CreatePuestoParqueoRequest
 import com.pucetec.park.dto.PuestoParqueoResponse
+import com.pucetec.park.dto.UpdatePuestoParqueoRequest
 import com.pucetec.park.services.PuestoParqueoService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -27,6 +28,12 @@ class PuestoParqueoController(
     fun createPuesto(@RequestBody request: CreatePuestoParqueoRequest): PuestoParqueoResponse {
         logger.info("POST /api/v1/puestos - numeroPuesto=${request.numeroPuesto}")
         return puestoParqueoService.createPuesto(request)
+    }
+
+    @PutMapping("/{id}")
+    fun updatePuesto(@PathVariable id: Long, @RequestBody request: UpdatePuestoParqueoRequest): PuestoParqueoResponse {
+        logger.info("PUT /api/v1/puestos/$id - numeroPuesto=${request.numeroPuesto}")
+        return puestoParqueoService.updatePuesto(id, request)
     }
 
     @PutMapping("/{id}/ocupar")

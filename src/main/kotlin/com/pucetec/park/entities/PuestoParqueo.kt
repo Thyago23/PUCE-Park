@@ -3,7 +3,10 @@ package com.pucetec.park.entities
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "puestos_parqueo")
+@Table(
+    name = "puestos_parqueo",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["zona_id", "numero_puesto"])]
+)
 class PuestoParqueo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +19,7 @@ class PuestoParqueo(
     @Column(name = "numero_puesto", length = 10, nullable = false)
     var numeroPuesto: String = "",
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", length = 20, nullable = false)
-    var estado: String = "DISPONIBLE"
+    var estado: EstadoPuesto = EstadoPuesto.DISPONIBLE
 )

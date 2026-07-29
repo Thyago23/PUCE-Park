@@ -1,6 +1,7 @@
 package com.pucetec.park.controllers
 
 import com.pucetec.park.dto.CreateZonaParqueoRequest
+import com.pucetec.park.dto.EstadisticasZonaResponse
 import com.pucetec.park.dto.UpdateZonaParqueoRequest
 import com.pucetec.park.dto.ZonaParqueoResponse
 import com.pucetec.park.services.ZonaParqueoService
@@ -19,6 +20,12 @@ class ZonaParqueoController(
     fun getAllZonas(): List<ZonaParqueoResponse> {
         logger.info("GET /api/v1/zonas")
         return zonaParqueoService.getAllZonas()
+    }
+
+    @GetMapping("/{id}/estadisticas")
+    fun getEstadisticas(@PathVariable id: Long): EstadisticasZonaResponse {
+        logger.info("GET /api/v1/zonas/$id/estadisticas")
+        return zonaParqueoService.getEstadisticas(id)
     }
 
     @PostMapping

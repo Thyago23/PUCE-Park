@@ -22,18 +22,26 @@ class SecurityConfig {
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
+                // Endpoints públicos
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/zonas").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/puestos/zona/**").permitAll()
-                
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/zonas/*/estadisticas").permitAll()
+
+                // DRIVER
                 auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*/ocupar").hasRole("DRIVER")
                 auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*/liberar").hasRole("DRIVER")
                 auth.requestMatchers("/api/v1/perfil/me").hasRole("DRIVER")
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/me").hasRole("DRIVER")
 
+                // GUARD
                 auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*/forzar-liberacion").hasRole("GUARD")
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/puesto/**").hasAnyRole("GUARD", "ADMIN")
 
+                // ADMIN
+                auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*").hasRole("ADMIN")
                 auth.requestMatchers("/api/v1/zonas/**").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.POST, "/api/v1/puestos").hasRole("ADMIN")
-                
+
                 auth.anyRequest().authenticated()
             }
             .oauth2ResourceServer { oauth2 ->

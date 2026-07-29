@@ -1,5 +1,6 @@
 package com.pucetec.park.repositories
 
+import com.pucetec.park.entities.EstadoPuesto
 import com.pucetec.park.entities.PuestoParqueo
 import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
@@ -15,4 +16,9 @@ interface PuestoParqueoRepository : JpaRepository<PuestoParqueo, Long> {
     fun findByIdWithPessimisticLock(@Param("id") id: Long): Optional<PuestoParqueo>
 
     fun findByZonaId(zonaId: Long): List<PuestoParqueo>
+    fun existsByNumeroPuestoAndZonaId(numeroPuesto: String, zonaId: Long): Boolean
+    fun existsByNumeroPuestoAndZonaIdAndIdNot(numeroPuesto: String, zonaId: Long, id: Long): Boolean
+    fun existsByZonaId(zonaId: Long): Boolean
+    fun countByZonaId(zonaId: Long): Long
+    fun countByZonaIdAndEstado(zonaId: Long, estado: EstadoPuesto): Long
 }

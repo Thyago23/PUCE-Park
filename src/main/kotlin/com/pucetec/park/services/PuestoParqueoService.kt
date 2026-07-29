@@ -1,8 +1,8 @@
 package com.pucetec.park.services
 
 import com.pucetec.park.dto.*
+import com.pucetec.park.entities.EstadoPuesto
 import com.pucetec.park.entities.HistorialParqueo
-import com.pucetec.park.entities.PuestoParqueo
 import com.pucetec.park.exceptions.*
 import com.pucetec.park.mappers.toEntity
 import com.pucetec.park.mappers.toResponse
@@ -31,10 +31,32 @@ class PuestoParqueoService(
     @Transactional
     fun createPuesto(request: CreatePuestoParqueoRequest): PuestoParqueoResponse {
         logger.info("Creating parking space: ${request.numeroPuesto}")
+        if (request.numeroPuesto.isBlank()) throw BlankFieldException("numeroPuesto no puede estar vacío")
         val zona = zonaParqueoRepository.findById(request.zonaId).orElseThrow {
             ZonaParqueoNotFoundException("Zona de parqueo ${request.zonaId} no encontrada")
         }
+        if (puestoParqueoRepository.existsByNumeroPuestoAndZonaId(request.numeroPuesto, request.zonaId)) {
+            throw NumeroPuestoDuplicadoException("Ya existe el puesto '${request.numeroPuesto}' en la zona ${zona.nombre}")
+        }
+        val count = puestoParqueoRepository.countByZonaId(request.zonaId)
+        if (count >= zona.capacidadMaxima) {
+            throw ZonaParqueoLlenaException("La zona ${zona.nombre} ha alcanzado su capacidad máxima de ${zona.capacidadMaxima} puestos")
+        }
         return puestoParqueoRepository.save(request.toEntity(zona)).toResponse()
+    }
+
+    @Transactional
+    fun updatePuesto(id: Long, request: UpdatePuestoParqueoRequest): PuestoParqueoResponse {
+        logger.info("Updating parking space $id")
+        val puesto = puestoParqueoRepository.findById(id).orElseThrow {
+            PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
+        }
+        if (request.numeroPuesto.isBlank()) throw BlankFieldException("numeroPuesto no puede estar vacío")
+        if (puestoParqueoRepository.existsByNumeroPuestoAndZonaIdAndIdNot(request.numeroPuesto, puesto.zona!!.id, id)) {
+            throw NumeroPuestoDuplicadoException("Ya existe el puesto '${request.numeroPuesto}' en la zona ${puesto.zona!!.nombre}")
+        }
+        puesto.numeroPuesto = request.numeroPuesto
+        return puestoParqueoRepository.save(puesto).toResponse()
     }
 
     @Transactional
@@ -43,15 +65,12 @@ class PuestoParqueoService(
         val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {
             PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
         }
-        if (puesto.estado == "OCUPADO") {
+        if (puesto.estado == EstadoPuesto.OCUPADO) {
             throw SlotAlreadyOccupiedException("El puesto $id ya está ocupado")
         }
-        puesto.estado = "OCUPADO"
+        puesto.estado = EstadoPuesto.OCUPADO
         puestoParqueoRepository.save(puesto)
-
-        val historial = HistorialParqueo(puesto = puesto, username = username)
-        historialParqueoRepository.save(historial)
-
+        historialParqueoRepository.save(HistorialParqueo(puesto = puesto, username = username))
         return puesto.toResponse()
     }
 
@@ -61,21 +80,17 @@ class PuestoParqueoService(
         val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {
             PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
         }
-        if (puesto.estado == "DISPONIBLE") {
-            throw SlotAlreadyOccupiedException("El puesto $id ya está disponible")
+        if (puesto.estado == EstadoPuesto.DISPONIBLE) {
+            throw SlotAlreadyAvailableException("El puesto $id ya está disponible")
         }
-
         val historial = historialParqueoRepository.findFirstByPuestoIdAndFechaSalidaIsNullOrderByFechaIngresoDesc(id)
             .orElseThrow { HistorialParqueoNotFoundException("Historial activo no encontrado para el puesto $id") }
-
         if (!isGuard && historial.username != username) {
             throw UnauthorizedAccessException("El usuario $username no está autorizado para liberar este puesto")
         }
-
         historial.fechaSalida = LocalDateTime.now()
         historialParqueoRepository.save(historial)
-
-        puesto.estado = "DISPONIBLE"
+        puesto.estado = EstadoPuesto.DISPONIBLE
         return puestoParqueoRepository.save(puesto).toResponse()
     }
 }
