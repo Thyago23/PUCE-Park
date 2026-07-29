@@ -47,7 +47,7 @@ class ZonaParqueoService(
             throw ZonaParqueoNombreDuplicadoException("Ya existe una zona con el nombre '${request.nombre}'")
         }
         zona.nombre = request.nombre
-        zona.descripcion = request.descripcion
+        zona.descripcion = request.descripcion ?: ""
         zona.capacidadMaxima = request.capacidadMaxima
         return zonaParqueoRepository.save(zona).toResponse()
     }

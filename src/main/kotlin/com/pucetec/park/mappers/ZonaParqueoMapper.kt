@@ -6,7 +6,7 @@ import com.pucetec.park.entities.ZonaParqueo
 
 fun CreateZonaParqueoRequest.toEntity() = ZonaParqueo(
     nombre = this.nombre,
-    descripcion = this.descripcion,
+    descripcion = this.descripcion ?: "",
     capacidadMaxima = this.capacidadMaxima
 )
 
