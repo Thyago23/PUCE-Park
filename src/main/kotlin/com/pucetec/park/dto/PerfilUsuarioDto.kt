@@ -3,6 +3,7 @@ package com.pucetec.park.dto
 data class UpdatePerfilUsuarioRequest(
     val nombreCompleto: String,
     val placaVehiculo: String,
+    val numeroPermiso: String,
     val modoOscuro: Boolean
 )
 
@@ -11,6 +12,7 @@ data class PerfilUsuarioResponse(
     val username: String,
     val nombreCompleto: String,
     val placaVehiculo: String,
+    val numeroPermiso: String,
     val modoOscuro: Boolean
 )
 

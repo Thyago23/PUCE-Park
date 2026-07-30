@@ -20,4 +20,13 @@ class ZonaParqueo(
 
     @Column(name = "capacidad_maxima", nullable = false)
     var capacidadMaxima: Int = 0,
+
+    @Column(name = "ubicacion", length = 255)
+    var ubicacion: String = "",
+
+    @Column(name = "latitud")
+    var latitud: Double? = null,
+
+    @Column(name = "longitud")
+    var longitud: Double? = null,
 )

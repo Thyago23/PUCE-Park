@@ -8,5 +8,6 @@ fun PerfilUsuario.toResponse() = PerfilUsuarioResponse(
     username = this.username,
     nombreCompleto = this.nombreCompleto,
     placaVehiculo = this.placaVehiculo,
+    numeroPermiso = this.numeroPermiso,
     modoOscuro = this.modoOscuro
 )

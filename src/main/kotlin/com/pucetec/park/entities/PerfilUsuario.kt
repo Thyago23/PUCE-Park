@@ -18,6 +18,9 @@ class PerfilUsuario(
     @Column(name = "placa_vehiculo", length = 15)
     var placaVehiculo: String = "",
 
+    @Column(name = "numero_permiso", length = 20, unique = true)
+    var numeroPermiso: String = "",
+
     @Column(name = "modo_oscuro", nullable = false)
     var modoOscuro: Boolean = false
 )

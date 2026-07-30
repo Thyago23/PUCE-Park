@@ -7,15 +7,21 @@ import com.pucetec.park.entities.ZonaParqueo
 fun CreateZonaParqueoRequest.toEntity() = ZonaParqueo(
     nombre = this.nombre,
     descripcion = this.descripcion ?: "",
-    capacidadMaxima = this.capacidadMaxima
+    capacidadMaxima = this.capacidadMaxima,
+    ubicacion = this.ubicacion ?: "",
+    latitud = this.latitud,
+    longitud = this.longitud
 )
 
 fun ZonaParqueo.toResponse(disponibles: Long = 0, ocupados: Long = 0) = ZonaParqueoResponse(
     id = this.id,
     nombre = this.nombre,
     descripcion = this.descripcion,
+    ubicacion = this.ubicacion,
     capacidadMaxima = this.capacidadMaxima,
     puestosDisponibles = disponibles,
     puestosOcupados = ocupados,
-    totalPuestos = disponibles + ocupados
+    totalPuestos = disponibles + ocupados,
+    latitud = this.latitud,
+    longitud = this.longitud
 )

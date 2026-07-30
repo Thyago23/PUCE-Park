@@ -72,8 +72,8 @@ class PuestoParqueoService(
     fun ocuparPuesto(id: Long, username: String): PuestoParqueoResponse {
         logger.info("Occupying parking space $id by user $username")
         val perfil = perfilUsuarioRepository.findByUsername(username).orElse(null)
-        if (perfil == null || perfil.placaVehiculo.isBlank()) {
-            throw PerfilIncompletoException("Debes registrar tu placa y nombre antes de ocupar un puesto")
+        if (perfil == null || perfil.placaVehiculo.isBlank() || perfil.nombreCompleto.isBlank() || perfil.numeroPermiso.isBlank()) {
+            throw PerfilIncompletoException("Debes completar tu perfil (nombre, placa y número de permiso) antes de ocupar un puesto")
         }
         val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {
             PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")

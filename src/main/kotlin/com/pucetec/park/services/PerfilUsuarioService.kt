@@ -32,6 +32,7 @@ class PerfilUsuarioService(
         val faltante = mutableListOf<String>()
         if (perfil == null || perfil.nombreCompleto.isBlank()) faltante.add("nombreCompleto")
         if (perfil == null || perfil.placaVehiculo.isBlank()) faltante.add("placaVehiculo")
+        if (perfil == null || perfil.numeroPermiso.isBlank()) faltante.add("numeroPermiso")
         return PerfilEstadoResponse(completo = faltante.isEmpty(), faltante = faltante)
     }
 
@@ -43,6 +44,7 @@ class PerfilUsuarioService(
         }
         perfil.nombreCompleto = request.nombreCompleto
         perfil.placaVehiculo = request.placaVehiculo
+        perfil.numeroPermiso = request.numeroPermiso
         perfil.modoOscuro = request.modoOscuro
         return perfilUsuarioRepository.save(perfil).toResponse()
     }
