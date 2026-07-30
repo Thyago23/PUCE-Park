@@ -19,6 +19,12 @@ class PuestoParqueo(
     @Column(name = "numero_puesto", length = 10, nullable = false)
     var numeroPuesto: String = "",
 
+    @Column(name = "fila", length = 30, nullable = false)
+    var fila: String = "",
+
+    @Column(name = "orden", nullable = false)
+    var orden: Int = 0,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", length = 20, nullable = false)
     var estado: EstadoPuesto = EstadoPuesto.DISPONIBLE

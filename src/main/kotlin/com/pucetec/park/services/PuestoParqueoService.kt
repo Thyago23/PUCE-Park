@@ -28,7 +28,7 @@ class PuestoParqueoService(
     @Transactional(readOnly = true)
     fun getPuestosByZona(zonaId: Long): List<PuestoParqueoResponse> {
         logger.info("Getting parking spaces for zone $zonaId")
-        return puestoParqueoRepository.findByZonaId(zonaId).map { it.toResponse() }
+        return puestoParqueoRepository.findByZonaIdOrderByFilaAscOrdenAsc(zonaId).map { it.toResponse() }
     }
 
     @Transactional

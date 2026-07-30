@@ -15,7 +15,7 @@ interface PuestoParqueoRepository : JpaRepository<PuestoParqueo, Long> {
     @Query("SELECT p FROM PuestoParqueo p WHERE p.id = :id")
     fun findByIdWithPessimisticLock(@Param("id") id: Long): Optional<PuestoParqueo>
 
-    fun findByZonaId(zonaId: Long): List<PuestoParqueo>
+    fun findByZonaIdOrderByFilaAscOrdenAsc(zonaId: Long): List<PuestoParqueo>
     fun existsByNumeroPuestoAndZonaId(numeroPuesto: String, zonaId: Long): Boolean
     fun existsByNumeroPuestoAndZonaIdAndIdNot(numeroPuesto: String, zonaId: Long, id: Long): Boolean
     fun existsByZonaId(zonaId: Long): Boolean

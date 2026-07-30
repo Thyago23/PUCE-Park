@@ -4,7 +4,9 @@ import com.pucetec.park.entities.EstadoPuesto
 
 data class CreatePuestoParqueoRequest(
     val zonaId: Long,
-    val numeroPuesto: String
+    val numeroPuesto: String,
+    val fila: String,
+    val orden: Int
 )
 
 data class UpdatePuestoParqueoRequest(
@@ -14,6 +16,8 @@ data class UpdatePuestoParqueoRequest(
 data class PuestoParqueoResponse(
     val id: Long,
     val numeroPuesto: String,
+    val fila: String,
+    val orden: Int,
     val estado: EstadoPuesto,
     val zona: ZonaParqueoResponse
 )
