@@ -8,9 +8,7 @@ fun CreateZonaParqueoRequest.toEntity() = ZonaParqueo(
     nombre = this.nombre,
     descripcion = this.descripcion ?: "",
     capacidadMaxima = this.capacidadMaxima,
-    ubicacion = this.ubicacion ?: "",
-    latitud = this.latitud,
-    longitud = this.longitud
+    ubicacion = this.ubicacion ?: ""
 )
 
 fun ZonaParqueo.toResponse(disponibles: Long = 0, ocupados: Long = 0) = ZonaParqueoResponse(
@@ -21,7 +19,5 @@ fun ZonaParqueo.toResponse(disponibles: Long = 0, ocupados: Long = 0) = ZonaParq
     capacidadMaxima = this.capacidadMaxima,
     puestosDisponibles = disponibles,
     puestosOcupados = ocupados,
-    totalPuestos = disponibles + ocupados,
-    latitud = this.latitud,
-    longitud = this.longitud
+    totalPuestos = disponibles + ocupados
 )

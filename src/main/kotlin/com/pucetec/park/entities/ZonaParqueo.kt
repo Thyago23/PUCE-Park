@@ -23,10 +23,4 @@ class ZonaParqueo(
 
     @Column(name = "ubicacion", length = 255)
     var ubicacion: String = "",
-
-    @Column(name = "latitud")
-    var latitud: Double? = null,
-
-    @Column(name = "longitud")
-    var longitud: Double? = null,
 )

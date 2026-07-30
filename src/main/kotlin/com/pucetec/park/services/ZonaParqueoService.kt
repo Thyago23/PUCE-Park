@@ -54,8 +54,6 @@ class ZonaParqueoService(
         zona.descripcion = request.descripcion ?: ""
         zona.capacidadMaxima = request.capacidadMaxima
         zona.ubicacion = request.ubicacion ?: zona.ubicacion
-        zona.latitud = request.latitud ?: zona.latitud
-        zona.longitud = request.longitud ?: zona.longitud
         return zonaParqueoRepository.save(zona).toResponse()
     }
 

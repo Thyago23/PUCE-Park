@@ -4,18 +4,14 @@ data class CreateZonaParqueoRequest(
     val nombre: String,
     val descripcion: String? = null,
     val capacidadMaxima: Int,
-    val ubicacion: String? = null,
-    val latitud: Double? = null,
-    val longitud: Double? = null
+    val ubicacion: String? = null
 )
 
 data class UpdateZonaParqueoRequest(
     val nombre: String,
     val descripcion: String? = null,
     val capacidadMaxima: Int,
-    val ubicacion: String? = null,
-    val latitud: Double? = null,
-    val longitud: Double? = null
+    val ubicacion: String? = null
 )
 
 data class ZonaParqueoResponse(
@@ -26,7 +22,5 @@ data class ZonaParqueoResponse(
     val capacidadMaxima: Int,
     val puestosDisponibles: Long,
     val puestosOcupados: Long,
-    val totalPuestos: Long,
-    val latitud: Double?,
-    val longitud: Double?
+    val totalPuestos: Long
 )
