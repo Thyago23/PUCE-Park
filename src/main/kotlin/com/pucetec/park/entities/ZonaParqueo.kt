@@ -16,11 +16,11 @@ class ZonaParqueo(
     var nombre: String = "",
 
     @Column(name = "descripcion", length = 255)
-    var descripcion: String = "",
+    var descripcion: String? = null,
 
     @Column(name = "capacidad_maxima", nullable = false)
     var capacidadMaxima: Int = 0,
 
     @Column(name = "ubicacion", length = 255)
-    var ubicacion: String = "",
+    var ubicacion: String? = null,
 )

@@ -18,14 +18,14 @@ class PerfilUsuarioController(
 
     @GetMapping("/estado")
     fun getEstado(@AuthenticationPrincipal jwt: Jwt): PerfilEstadoResponse {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("GET /api/v1/perfil/me/estado - username=$username")
         return perfilUsuarioService.getEstadoPerfil(username)
     }
 
     @GetMapping
     fun getPerfil(@AuthenticationPrincipal jwt: Jwt): PerfilUsuarioResponse {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("GET /api/v1/perfil/me - username=$username")
         return perfilUsuarioService.getOrCreatePerfil(username)
     }
@@ -35,7 +35,7 @@ class PerfilUsuarioController(
         @AuthenticationPrincipal jwt: Jwt,
         @RequestBody request: UpdatePerfilUsuarioRequest
     ): PerfilUsuarioResponse {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("PUT /api/v1/perfil/me - username=$username")
         return perfilUsuarioService.updatePerfil(username, request)
     }

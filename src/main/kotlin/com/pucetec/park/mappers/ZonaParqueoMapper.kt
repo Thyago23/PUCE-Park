@@ -14,8 +14,8 @@ fun CreateZonaParqueoRequest.toEntity() = ZonaParqueo(
 fun ZonaParqueo.toResponse(disponibles: Long = 0, ocupados: Long = 0) = ZonaParqueoResponse(
     id = this.id,
     nombre = this.nombre,
-    descripcion = this.descripcion,
-    ubicacion = this.ubicacion,
+    descripcion = this.descripcion ?: "",
+    ubicacion = this.ubicacion ?: "",
     capacidadMaxima = this.capacidadMaxima,
     puestosDisponibles = disponibles,
     puestosOcupados = ocupados,

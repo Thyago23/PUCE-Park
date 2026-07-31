@@ -23,6 +23,7 @@ interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
     fun findFirstByPuestoIdAndFechaSalidaIsNullOrderByFechaIngresoDesc(puestoId: Long): Optional<HistorialParqueo>
     fun findByUsernameOrderByFechaIngresoDesc(username: String): List<HistorialParqueo>
     fun findByPuestoIdOrderByFechaIngresoDesc(puestoId: Long): List<HistorialParqueo>
+    fun existsByUsernameAndFechaSalidaIsNull(username: String): Boolean
 
     @Query(value = """
         SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (h.fecha_salida - h.fecha_ingreso)) / 3600.0), 0) as total_horas,

@@ -18,7 +18,7 @@ class HistorialParqueoController(
 
     @GetMapping("/me")
     fun getMiHistorial(@AuthenticationPrincipal jwt: Jwt): List<HistorialParqueoResponse> {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("GET /api/v1/historial/me - username=$username")
         return historialParqueoService.getHistorialByUsername(username)
     }
@@ -28,7 +28,7 @@ class HistorialParqueoController(
         @AuthenticationPrincipal jwt: Jwt,
         @RequestParam mes: String
     ): EstadisticasPersonalesResponse {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("GET /api/v1/historial/me/estadisticas - username=$username, mes=$mes")
         return historialParqueoService.getEstadisticasPersonales(username, mes)
     }

@@ -44,21 +44,21 @@ class PuestoParqueoController(
 
     @PutMapping("/{id}/ocupar")
     fun ocuparPuesto(@PathVariable id: Long, @AuthenticationPrincipal jwt: Jwt): PuestoParqueoResponse {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("PUT /api/v1/puestos/$id/ocupar - username=$username")
         return puestoParqueoService.ocuparPuesto(id, username)
     }
 
     @PutMapping("/{id}/liberar")
     fun liberarPuesto(@PathVariable id: Long, @AuthenticationPrincipal jwt: Jwt): PuestoParqueoResponse {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("PUT /api/v1/puestos/$id/liberar - username=$username")
         return puestoParqueoService.liberarPuesto(id, username, isGuard = false)
     }
 
     @PutMapping("/{id}/forzar-liberacion")
     fun forzarLiberacion(@PathVariable id: Long, @AuthenticationPrincipal jwt: Jwt): PuestoParqueoResponse {
-        val username = jwt.getClaimAsString("username") ?: jwt.subject
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("PUT /api/v1/puestos/$id/forzar-liberacion - username=$username")
         return puestoParqueoService.liberarPuesto(id, username, isGuard = true)
     }
