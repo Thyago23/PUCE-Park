@@ -33,6 +33,13 @@ class HistorialParqueoController(
         return historialParqueoService.getEstadisticasPersonales(username, mes)
     }
 
+    @GetMapping("/guardia/me")
+    fun getMiHistorialGuardia(@AuthenticationPrincipal jwt: Jwt): List<HistorialParqueoResponse> {
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
+        logger.info("GET /api/v1/historial/guardia/me - username=$username")
+        return historialParqueoService.getHistorialByGuardia(username)
+    }
+
     @GetMapping("/puesto/{puestoId}")
     fun getHistorialByPuesto(@PathVariable puestoId: Long): List<HistorialParqueoResponse> {
         logger.info("GET /api/v1/historial/puesto/$puestoId")

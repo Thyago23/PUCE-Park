@@ -13,6 +13,10 @@ data class UpdatePuestoParqueoRequest(
     val numeroPuesto: String
 )
 
+data class ForzarOcupacionRequest(
+    val placaVehiculo: String
+)
+
 data class PuestoParqueoResponse(
     val id: Long,
     val numeroPuesto: String,

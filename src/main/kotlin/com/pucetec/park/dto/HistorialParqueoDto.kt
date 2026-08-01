@@ -8,5 +8,6 @@ data class HistorialParqueoResponse(
     val username: String,
     val fechaIngreso: LocalDateTime,
     val fechaSalida: LocalDateTime?,
+    val placaVehiculo: String?,
     val puesto: PuestoParqueoResponse
 )

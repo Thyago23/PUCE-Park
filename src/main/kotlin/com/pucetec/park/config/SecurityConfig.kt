@@ -28,13 +28,14 @@ class SecurityConfig {
                 auth.requestMatchers(HttpMethod.PUT, "/api/v1/zonas/*").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.DELETE, "/api/v1/zonas/*").hasRole("ADMIN")
                 // Puestos — acciones de estado primero (más específicas)
-                auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*/forzar-liberacion").hasAnyRole("ADMIN", "GUARD")
+                auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*/forzar-liberacion", "/api/v1/puestos/*/forzar-ocupacion").hasAnyRole("ADMIN", "GUARD")
                 auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*/ocupar", "/api/v1/puestos/*/liberar").hasAnyRole("ADMIN", "GUARD", "USER")
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/puestos", "/api/v1/puestos/zona/*").hasAnyRole("ADMIN", "GUARD", "USER")
                 auth.requestMatchers(HttpMethod.POST, "/api/v1/puestos").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.PUT, "/api/v1/puestos/*").hasRole("ADMIN")
                 // Historial y ranking
-                auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/me", "/api/v1/historial/me/estadisticas").hasAnyRole("ADMIN", "GUARD", "USER")
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/me", "/api/v1/historial/me/estadisticas").hasAnyRole("ADMIN", "USER")
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/guardia/me").hasAnyRole("ADMIN", "GUARD")
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/ranking/mensual").hasAnyRole("ADMIN", "GUARD", "USER")
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/puesto/*").hasAnyRole("ADMIN", "GUARD")
                 // Perfil

@@ -48,6 +48,7 @@ interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
         FROM historial_parqueo h
         LEFT JOIN perfiles_usuario p ON p.username = h.username
         WHERE h.fecha_salida IS NOT NULL
+          AND h.username NOT LIKE 'GUARDIA:%'
           AND EXTRACT(YEAR FROM h.fecha_ingreso) = :year
           AND EXTRACT(MONTH FROM h.fecha_ingreso) = :month
         GROUP BY h.username, p.nombre_completo

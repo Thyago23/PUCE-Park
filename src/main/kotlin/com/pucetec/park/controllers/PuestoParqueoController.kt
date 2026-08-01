@@ -1,6 +1,7 @@
 package com.pucetec.park.controllers
 
 import com.pucetec.park.dto.CreatePuestoParqueoRequest
+import com.pucetec.park.dto.ForzarOcupacionRequest
 import com.pucetec.park.dto.PuestoParqueoResponse
 import com.pucetec.park.dto.UpdatePuestoParqueoRequest
 import com.pucetec.park.services.PuestoParqueoService
@@ -61,5 +62,12 @@ class PuestoParqueoController(
         val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
         logger.info("PUT /api/v1/puestos/$id/forzar-liberacion - username=$username")
         return puestoParqueoService.liberarPuesto(id, username, isGuard = true)
+    }
+
+    @PutMapping("/{id}/forzar-ocupacion")
+    fun forzarOcupacion(@PathVariable id: Long, @RequestBody request: ForzarOcupacionRequest, @AuthenticationPrincipal jwt: Jwt): PuestoParqueoResponse {
+        val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
+        logger.info("PUT /api/v1/puestos/$id/forzar-ocupacion - placa=${request.placaVehiculo}, username=$username")
+        return puestoParqueoService.forzarOcupacion(id, request.placaVehiculo, username)
     }
 }

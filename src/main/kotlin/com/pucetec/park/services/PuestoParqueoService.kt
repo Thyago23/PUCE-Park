@@ -92,6 +92,25 @@ class PuestoParqueoService(
     }
 
     @Transactional
+    fun forzarOcupacion(id: Long, placaVehiculo: String, guardUsername: String): PuestoParqueoResponse {
+        logger.info("Force-occupying parking space $id with placa=$placaVehiculo by guard=$guardUsername")
+        if (placaVehiculo.isBlank()) throw BlankFieldException("placaVehiculo no puede estar vacío")
+        val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {
+            PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
+        }
+        if (puesto.estado == EstadoPuesto.OCUPADO) {
+            throw SlotAlreadyOccupiedException("El puesto $id ya está ocupado")
+        }
+        puesto.estado = EstadoPuesto.OCUPADO
+        puestoParqueoRepository.save(puesto)
+        val codigoTicket = "G-${UUID.randomUUID().toString().take(10).uppercase()}"
+        historialParqueoRepository.save(
+            HistorialParqueo(puesto = puesto, username = "GUARDIA:$guardUsername", codigoTicket = codigoTicket, placaVehiculo = placaVehiculo)
+        )
+        return puesto.toResponse()
+    }
+
+    @Transactional
     fun liberarPuesto(id: Long, username: String, isGuard: Boolean): PuestoParqueoResponse {
         logger.info("Freeing parking space $id (isGuard=$isGuard)")
         val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {

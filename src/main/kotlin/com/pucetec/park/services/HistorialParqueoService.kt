@@ -26,6 +26,12 @@ class HistorialParqueoService(
     }
 
     @Transactional(readOnly = true)
+    fun getHistorialByGuardia(guardUsername: String): List<HistorialParqueoResponse> {
+        logger.info("Getting guard historial for GUARDIA:$guardUsername")
+        return historialParqueoRepository.findByUsernameOrderByFechaIngresoDesc("GUARDIA:$guardUsername").map { it.toResponse() }
+    }
+
+    @Transactional(readOnly = true)
     fun getHistorialByPuesto(puestoId: Long): List<HistorialParqueoResponse> {
         logger.info("Getting historial for parking space $puestoId")
         if (!puestoParqueoRepository.existsById(puestoId)) {

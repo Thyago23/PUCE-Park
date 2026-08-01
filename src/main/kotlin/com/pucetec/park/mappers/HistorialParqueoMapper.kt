@@ -9,5 +9,6 @@ fun HistorialParqueo.toResponse() = HistorialParqueoResponse(
     username = this.username,
     fechaIngreso = this.fechaIngreso,
     fechaSalida = this.fechaSalida,
+    placaVehiculo = this.placaVehiculo,
     puesto = this.puesto!!.toResponse()
 )

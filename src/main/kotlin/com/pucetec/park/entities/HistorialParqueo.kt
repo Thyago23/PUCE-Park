@@ -24,5 +24,8 @@ class HistorialParqueo(
     val fechaIngreso: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "fecha_salida")
-    var fechaSalida: LocalDateTime? = null
+    var fechaSalida: LocalDateTime? = null,
+
+    @Column(name = "placa_vehiculo", length = 15)
+    val placaVehiculo: String? = null
 )
