@@ -3,7 +3,7 @@ package com.pucetec.park.entities
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "perfiles_usuario")
+@Table(name = "user_profiles")
 class PerfilUsuario(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,15 +12,15 @@ class PerfilUsuario(
     @Column(name = "username", length = 60, nullable = false, unique = true)
     val username: String = "",
 
-    @Column(name = "nombre_completo", length = 100)
+    @Column(name = "full_name", length = 100)
     var nombreCompleto: String = "",
 
-    @Column(name = "placa_vehiculo", length = 15)
+    @Column(name = "vehicle_plate", length = 15)
     var placaVehiculo: String = "",
 
-    @Column(name = "numero_permiso", length = 20, unique = true, nullable = true)
+    @Column(name = "permit_number", length = 20, unique = true, nullable = true)
     var numeroPermiso: String? = null,
 
-    @Column(name = "modo_oscuro", nullable = false)
+    @Column(name = "dark_mode", nullable = false)
     var modoOscuro: Boolean = false
 )

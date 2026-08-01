@@ -4,28 +4,28 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "historial_parqueo")
+@Table(name = "parking_history")
 class HistorialParqueo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "puesto_id", nullable = false)
+    @JoinColumn(name = "space_id", nullable = false)
     val puesto: PuestoParqueo? = null,
 
     @Column(name = "username", length = 60, nullable = false)
     val username: String = "",
 
-    @Column(name = "codigo_ticket", length = 15, nullable = false, unique = true)
+    @Column(name = "ticket_code", length = 15, nullable = false, unique = true)
     val codigoTicket: String = "",
 
-    @Column(name = "fecha_ingreso", nullable = false)
+    @Column(name = "entry_date", nullable = false)
     val fechaIngreso: LocalDateTime = LocalDateTime.now(),
 
-    @Column(name = "fecha_salida")
+    @Column(name = "exit_date")
     var fechaSalida: LocalDateTime? = null,
 
-    @Column(name = "placa_vehiculo", length = 15)
+    @Column(name = "vehicle_plate", length = 15)
     val placaVehiculo: String? = null
 )

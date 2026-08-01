@@ -4,23 +4,23 @@ import jakarta.persistence.*
 
 @Entity
 @Table(
-    name = "zonas_parqueo",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["nombre"])]
+    name = "parking_zones",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["name"])]
 )
 class ZonaParqueo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L,
 
-    @Column(name = "nombre", length = 50, nullable = false, unique = true)
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     var nombre: String = "",
 
-    @Column(name = "descripcion", length = 255)
+    @Column(name = "description", length = 255)
     var descripcion: String? = null,
 
-    @Column(name = "capacidad_maxima", nullable = false)
+    @Column(name = "max_capacity", nullable = false)
     var capacidadMaxima: Int = 0,
 
-    @Column(name = "ubicacion", length = 255)
+    @Column(name = "location", length = 255)
     var ubicacion: String? = null,
 )

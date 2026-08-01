@@ -26,13 +26,13 @@ interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
     fun existsByUsernameAndFechaSalidaIsNull(username: String): Boolean
 
     @Query(value = """
-        SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (h.fecha_salida - h.fecha_ingreso)) / 3600.0), 0) as total_horas,
+        SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (h.exit_date - h.entry_date)) / 3600.0), 0) as total_horas,
                COUNT(h.id) as total_sesiones
-        FROM historial_parqueo h
-        WHERE h.fecha_salida IS NOT NULL
+        FROM parking_history h
+        WHERE h.exit_date IS NOT NULL
           AND h.username = :username
-          AND EXTRACT(YEAR FROM h.fecha_ingreso) = :year
-          AND EXTRACT(MONTH FROM h.fecha_ingreso) = :month
+          AND EXTRACT(YEAR FROM h.entry_date) = :year
+          AND EXTRACT(MONTH FROM h.entry_date) = :month
     """, nativeQuery = true)
     fun getEstadisticasPersonales(
         @Param("username") username: String,
@@ -42,16 +42,16 @@ interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
 
     @Query(value = """
         SELECT h.username as username,
-               COALESCE(p.nombre_completo, h.username) as nombre_completo,
-               COALESCE(SUM(EXTRACT(EPOCH FROM (h.fecha_salida - h.fecha_ingreso)) / 3600.0), 0) as total_horas,
+               COALESCE(p.full_name, h.username) as nombre_completo,
+               COALESCE(SUM(EXTRACT(EPOCH FROM (h.exit_date - h.entry_date)) / 3600.0), 0) as total_horas,
                COUNT(h.id) as total_sesiones
-        FROM historial_parqueo h
-        LEFT JOIN perfiles_usuario p ON p.username = h.username
-        WHERE h.fecha_salida IS NOT NULL
+        FROM parking_history h
+        LEFT JOIN user_profiles p ON p.username = h.username
+        WHERE h.exit_date IS NOT NULL
           AND h.username NOT LIKE 'GUARDIA:%'
-          AND EXTRACT(YEAR FROM h.fecha_ingreso) = :year
-          AND EXTRACT(MONTH FROM h.fecha_ingreso) = :month
-        GROUP BY h.username, p.nombre_completo
+          AND EXTRACT(YEAR FROM h.entry_date) = :year
+          AND EXTRACT(MONTH FROM h.entry_date) = :month
+        GROUP BY h.username, p.full_name
         ORDER BY total_horas DESC
         LIMIT 20
     """, nativeQuery = true)
