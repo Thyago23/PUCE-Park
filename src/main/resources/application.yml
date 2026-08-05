@@ -21,9 +21,9 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/puce_park
+    url: jdbc:postgresql://localhost:5434/puce_park
     username: postgres
-    password: Mamimarci.10
+    password: password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

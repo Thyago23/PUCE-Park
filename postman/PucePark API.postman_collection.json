@@ -1,0 +1,415 @@
+{
+  "info": {
+    "name": "PucePark API",
+    "_postman_id": "puce-park-api-v1",
+    "description": "API REST para el sistema de parqueo PUCE. Todos los endpoints requieren Bearer token (JWT de AWS Cognito).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "PEGA_TU_JWT_AQUI",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Zonas de Parqueo",
+      "item": [
+        {
+          "name": "GET Todas las zonas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/zonas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "zonas"]
+            },
+            "description": "Retorna todas las zonas con disponibilidad. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "GET Estadísticas de zona",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/zonas/1/estadisticas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "zonas", "1", "estadisticas"]
+            },
+            "description": "Retorna estadísticas de ocupación de una zona. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "POST Crear zona",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Zona A\",\n  \"descripcion\": \"Zona norte del campus\",\n  \"capacidadMaxima\": 20,\n  \"ubicacion\": \"Edificio Norte\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/zonas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "zonas"]
+            },
+            "description": "Crea una nueva zona de parqueo. Rol: ADMIN."
+          }
+        },
+        {
+          "name": "PUT Actualizar zona",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Zona A Actualizada\",\n  \"descripcion\": \"Zona norte del campus - ampliada\",\n  \"capacidadMaxima\": 30,\n  \"ubicacion\": \"Edificio Norte Ala 2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/zonas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "zonas", "1"]
+            },
+            "description": "Actualiza una zona existente. Rol: ADMIN."
+          }
+        },
+        {
+          "name": "DELETE Eliminar zona",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/zonas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "zonas", "1"]
+            },
+            "description": "Elimina una zona sin puestos asignados. Rol: ADMIN."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Puestos de Parqueo",
+      "item": [
+        {
+          "name": "GET Todos los puestos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos"]
+            },
+            "description": "Retorna todos los puestos de todas las zonas. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "GET Puestos por zona",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos/zona/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos", "zona", "1"]
+            },
+            "description": "Retorna puestos de una zona específica ordenados por fila y posición. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "POST Crear puesto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zonaId\": 1,\n  \"numeroPuesto\": \"A-01\",\n  \"fila\": \"A\",\n  \"orden\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos"]
+            },
+            "description": "Crea un nuevo puesto en una zona. Rol: ADMIN."
+          }
+        },
+        {
+          "name": "PUT Actualizar puesto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroPuesto\": \"A-01-BIS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos", "1"]
+            },
+            "description": "Actualiza el número de un puesto. Rol: ADMIN."
+          }
+        },
+        {
+          "name": "PUT Ocupar puesto (estudiante)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos/1/ocupar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos", "1", "ocupar"]
+            },
+            "description": "El estudiante ocupa el puesto con su JWT. Requiere perfil completo (nombre + placa + permiso). Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "PUT Liberar puesto (estudiante)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos/1/liberar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos", "1", "liberar"]
+            },
+            "description": "El estudiante libera su propio puesto. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "PUT Forzar ocupación (guardia)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placaVehiculo\": \"ABC-1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos/1/forzar-ocupacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos", "1", "forzar-ocupacion"]
+            },
+            "description": "El guardia ocupa manualmente un puesto para un vehículo específico. Roles: ADMIN, GUARD."
+          }
+        },
+        {
+          "name": "PUT Forzar liberación (guardia)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/puestos/1/forzar-liberacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "puestos", "1", "forzar-liberacion"]
+            },
+            "description": "El guardia libera cualquier puesto sin importar quién lo ocupa. Roles: ADMIN, GUARD."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Historial de Parqueo",
+      "item": [
+        {
+          "name": "GET Mi historial (estudiante)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historial/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historial", "me"]
+            },
+            "description": "Historial del estudiante autenticado ordenado por fecha desc. Roles: ADMIN, USER."
+          }
+        },
+        {
+          "name": "GET Mis estadísticas personales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historial/me/estadisticas?mes=2026-08",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historial", "me", "estadisticas"],
+              "query": [
+                {
+                  "key": "mes",
+                  "value": "2026-08",
+                  "description": "Formato: YYYY-MM"
+                }
+              ]
+            },
+            "description": "Estadísticas del mes: total de sesiones, horas y promedio. Roles: ADMIN, USER."
+          }
+        },
+        {
+          "name": "GET Mi historial (guardia)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historial/guardia/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historial", "guardia", "me"]
+            },
+            "description": "Historial de acciones del guardia autenticado. Roles: ADMIN, GUARD."
+          }
+        },
+        {
+          "name": "GET Historial por puesto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historial/puesto/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historial", "puesto", "1"]
+            },
+            "description": "Historial completo de un puesto específico. Roles: ADMIN, GUARD."
+          }
+        },
+        {
+          "name": "GET Ranking mensual",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historial/ranking/mensual?mes=2026-08",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historial", "ranking", "mensual"],
+              "query": [
+                {
+                  "key": "mes",
+                  "value": "2026-08",
+                  "description": "Formato: YYYY-MM"
+                }
+              ]
+            },
+            "description": "Ranking de estudiantes por horas de parqueo en el mes (excluye registros de guardia). Roles: ADMIN, GUARD, USER."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Perfil de Usuario",
+      "item": [
+        {
+          "name": "GET Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "me"]
+            },
+            "description": "Obtiene (o crea si no existe) el perfil del usuario autenticado. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "GET Estado del perfil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/me/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "me", "estado"]
+            },
+            "description": "Indica si el perfil está completo y qué campos faltan. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "PUT Actualizar perfil (estudiante)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreCompleto\": \"Bryan Taco\",\n  \"placaVehiculo\": \"ABC-1234\",\n  \"numeroPermiso\": \"P-00123\",\n  \"modoOscuro\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "me"]
+            },
+            "description": "Actualiza los datos del perfil del estudiante. Roles: ADMIN, GUARD, USER."
+          }
+        },
+        {
+          "name": "PUT Actualizar perfil (guardia)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreCompleto\": \"Carlos Guardia\",\n  \"placaVehiculo\": \"\",\n  \"numeroPermiso\": \"\",\n  \"modoOscuro\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "me"]
+            },
+            "description": "Actualiza el perfil de un guardia (placa y permiso vacíos). Roles: ADMIN, GUARD, USER."
+          }
+        }
+      ]
+    }
+  ]
+}
