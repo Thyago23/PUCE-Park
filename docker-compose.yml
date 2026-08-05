@@ -1,7 +1,9 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  db:
+
+  # ── Base de datos 1: Parqueo principal ────────────────────────────────────────
+  db_park:
     image: postgres:16-alpine
     container_name: puce_park_db
     environment:
@@ -11,7 +13,9 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db_park_data:/var/lib/postgresql/data
+    networks:
+      - park_net
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d puce_park"]
@@ -19,20 +23,61 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
+  # ── Base de datos 2: Microservicios ───────────────────────────────────────────
+  db_micro:
+    image: postgres:16-alpine
+    container_name: puce_micro_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: puce_micro
+    ports:
+      - "5435:5432"
+    volumes:
+      - db_micro_data:/var/lib/postgresql/data
+    networks:
+      - park_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d puce_micro"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Aplicación Spring Boot principal ──────────────────────────────────────────
+  park-app:
     build: .
     container_name: puce_park_backend
-    ports:
-      - "8080:8080"
     environment:
-      # Sobreescribe la URL para apuntar al contenedor de base de datos
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/puce_park
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_park:5432/puce_park
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
     depends_on:
-      db:
+      db_park:
         condition: service_healthy
+    networks:
+      - park_net
+    restart: unless-stopped
+
+  # ── Nginx: reverse proxy + balanceo ───────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: puce_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - park-app
+    networks:
+      - park_net
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  db_park_data:
+  db_micro_data:
+
+networks:
+  park_net:
+    driver: bridge
