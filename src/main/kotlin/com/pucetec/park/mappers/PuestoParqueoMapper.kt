@@ -8,17 +8,17 @@ import com.pucetec.park.entities.ZonaParqueo
 
 fun CreatePuestoParqueoRequest.toEntity(zonaRef: ZonaParqueo) = PuestoParqueo(
     zona = zonaRef,
-    numeroPuesto = this.numeroPuesto,
-    fila = this.fila,
-    orden = this.orden,
+    numeroPuesto = this.spaceNumber,
+    fila = this.row,
+    orden = this.order,
     estado = EstadoPuesto.DISPONIBLE
 )
 
 fun PuestoParqueo.toResponse() = PuestoParqueoResponse(
     id = this.id,
-    numeroPuesto = this.numeroPuesto,
-    fila = this.fila,
-    orden = this.orden,
-    estado = this.estado,
-    zona = this.zona!!.toResponse()
+    spaceNumber = this.numeroPuesto,
+    row = this.fila,
+    order = this.orden,
+    status = this.estado,
+    zone = this.zona!!.toResponse()
 )

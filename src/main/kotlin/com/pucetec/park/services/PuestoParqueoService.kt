@@ -35,22 +35,22 @@ class PuestoParqueoService(
 
     @Transactional
     fun createPuesto(request: CreatePuestoParqueoRequest): PuestoParqueoResponse {
-        logger.info("Creating parking space '${request.numeroPuesto}' in zone id=${request.zonaId}...")
-        if (request.numeroPuesto.isBlank()) throw BlankFieldException("numeroPuesto no puede estar vacío")
-        logger.info("Loading zone id=${request.zonaId}...")
-        val zona = zonaParqueoRepository.findById(request.zonaId).orElseThrow {
-            ZonaParqueoNotFoundException("Zona de parqueo ${request.zonaId} no encontrada")
+        logger.info("Creating parking space '${request.spaceNumber}' in zone id=${request.zoneId}...")
+        if (request.spaceNumber.isBlank()) throw BlankFieldException("spaceNumber must not be blank")
+        logger.info("Loading zone id=${request.zoneId}...")
+        val zona = zonaParqueoRepository.findById(request.zoneId).orElseThrow {
+            ZonaParqueoNotFoundException("Parking zone ${request.zoneId} not found")
         }
-        logger.info("Checking for duplicate space number '${request.numeroPuesto}' in zone '${zona.nombre}'...")
-        if (puestoParqueoRepository.existsByNumeroPuestoAndZonaId(request.numeroPuesto, request.zonaId)) {
-            throw NumeroPuestoDuplicadoException("Ya existe el puesto '${request.numeroPuesto}' en la zona ${zona.nombre}")
+        logger.info("Checking for duplicate space number '${request.spaceNumber}' in zone '${zona.nombre}'...")
+        if (puestoParqueoRepository.existsByNumeroPuestoAndZonaId(request.spaceNumber, request.zoneId)) {
+            throw NumeroPuestoDuplicadoException("Space '${request.spaceNumber}' already exists in zone ${zona.nombre}")
         }
-        val count = puestoParqueoRepository.countByZonaId(request.zonaId)
+        val count = puestoParqueoRepository.countByZonaId(request.zoneId)
         logger.info("Zone '${zona.nombre}' has $count/${zona.capacidadMaxima} spaces. Checking capacity...")
         if (count >= zona.capacidadMaxima) {
-            throw ZonaParqueoLlenaException("La zona ${zona.nombre} ha alcanzado su capacidad máxima de ${zona.capacidadMaxima} puestos")
+            throw ZonaParqueoLlenaException("Zone ${zona.nombre} has reached its maximum capacity of ${zona.capacidadMaxima} spaces")
         }
-        logger.info("Saving parking space '${request.numeroPuesto}' to database...")
+        logger.info("Saving parking space '${request.spaceNumber}' to database...")
         val saved = puestoParqueoRepository.save(request.toEntity(zona))
         logger.info("Parking space '${saved.numeroPuesto}' created successfully with id=${saved.id}.")
         return saved.toResponse()
@@ -58,16 +58,16 @@ class PuestoParqueoService(
 
     @Transactional
     fun updatePuesto(id: Long, request: UpdatePuestoParqueoRequest): PuestoParqueoResponse {
-        logger.info("Updating parking space id=$id with spaceNumber='${request.numeroPuesto}'...")
+        logger.info("Updating parking space id=$id with spaceNumber='${request.spaceNumber}'...")
         val puesto = puestoParqueoRepository.findById(id).orElseThrow {
-            PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
+            PuestoParqueoNotFoundException("Parking space $id not found")
         }
         logger.info("Parking space id=$id found: '${puesto.numeroPuesto}'. Validating new data...")
-        if (request.numeroPuesto.isBlank()) throw BlankFieldException("numeroPuesto no puede estar vacío")
-        if (puestoParqueoRepository.existsByNumeroPuestoAndZonaIdAndIdNot(request.numeroPuesto, puesto.zona!!.id, id)) {
-            throw NumeroPuestoDuplicadoException("Ya existe el puesto '${request.numeroPuesto}' en la zona ${puesto.zona!!.nombre}")
+        if (request.spaceNumber.isBlank()) throw BlankFieldException("spaceNumber must not be blank")
+        if (puestoParqueoRepository.existsByNumeroPuestoAndZonaIdAndIdNot(request.spaceNumber, puesto.zona!!.id, id)) {
+            throw NumeroPuestoDuplicadoException("Space '${request.spaceNumber}' already exists in zone ${puesto.zona!!.nombre}")
         }
-        puesto.numeroPuesto = request.numeroPuesto
+        puesto.numeroPuesto = request.spaceNumber
         logger.info("Saving updated parking space id=$id...")
         val saved = puestoParqueoRepository.save(puesto)
         logger.info("Parking space id=$id updated successfully.")
@@ -89,20 +89,20 @@ class PuestoParqueoService(
         val perfil = perfilUsuarioRepository.findByUsername(username).orElse(null)
         if (perfil == null || perfil.placaVehiculo.isBlank() || perfil.nombreCompleto.isBlank() || perfil.numeroPermiso.isNullOrBlank()) {
             logger.warn("User '$username' profile is incomplete. Cannot occupy space id=$id.")
-            throw PerfilIncompletoException("Debes completar tu perfil (nombre, placa y número de permiso) antes de ocupar un puesto")
+            throw PerfilIncompletoException("You must complete your profile (fullName, vehiclePlate and permitNumber) before occupying a space")
         }
         logger.info("Checking if user '$username' already has an active space...")
         if (historialParqueoRepository.existsByUsernameAndFechaSalidaIsNull(username)) {
             logger.warn("User '$username' already has an active parking space. Cannot occupy another.")
-            throw UserAlreadyOccupyingException("Ya tienes un puesto activo. Debes liberarlo antes de ocupar otro.")
+            throw UserAlreadyOccupyingException("You already have an active space. Release it before occupying another.")
         }
         logger.info("Acquiring pessimistic lock on parking space id=$id...")
         val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {
-            PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
+            PuestoParqueoNotFoundException("Parking space $id not found")
         }
         if (puesto.estado == EstadoPuesto.OCUPADO) {
             logger.warn("Parking space id=$id is already occupied.")
-            throw SlotAlreadyOccupiedException("El puesto $id ya está ocupado")
+            throw SlotAlreadyOccupiedException("Parking space $id is already occupied")
         }
         puesto.estado = EstadoPuesto.OCUPADO
         puestoParqueoRepository.save(puesto)
@@ -114,23 +114,23 @@ class PuestoParqueoService(
     }
 
     @Transactional
-    fun forzarOcupacion(id: Long, placaVehiculo: String, guardUsername: String): PuestoParqueoResponse {
-        logger.info("Guard '$guardUsername' is force-occupying parking space id=$id for vehicle '$placaVehiculo'...")
-        if (placaVehiculo.isBlank()) throw BlankFieldException("placaVehiculo no puede estar vacío")
+    fun forzarOcupacion(id: Long, vehiclePlate: String, guardUsername: String): PuestoParqueoResponse {
+        logger.info("Guard '$guardUsername' is force-occupying parking space id=$id for vehicle '$vehiclePlate'...")
+        if (vehiclePlate.isBlank()) throw BlankFieldException("vehiclePlate must not be blank")
         logger.info("Acquiring pessimistic lock on parking space id=$id...")
         val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {
-            PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
+            PuestoParqueoNotFoundException("Parking space $id not found")
         }
         if (puesto.estado == EstadoPuesto.OCUPADO) {
             logger.warn("Parking space id=$id is already occupied. Force-occupation by guard '$guardUsername' rejected.")
-            throw SlotAlreadyOccupiedException("El puesto $id ya está ocupado")
+            throw SlotAlreadyOccupiedException("Parking space $id is already occupied")
         }
         puesto.estado = EstadoPuesto.OCUPADO
         puestoParqueoRepository.save(puesto)
         val codigoTicket = "G-${UUID.randomUUID().toString().take(10).uppercase()}"
-        logger.info("Saving guard history entry: guard='GUARDIA:$guardUsername', space=$id, plate='$placaVehiculo', ticket='$codigoTicket'...")
+        logger.info("Saving guard history entry: guard='GUARDIA:$guardUsername', space=$id, plate='$vehiclePlate', ticket='$codigoTicket'...")
         historialParqueoRepository.save(
-            HistorialParqueo(puesto = puesto, username = "GUARDIA:$guardUsername", codigoTicket = codigoTicket, placaVehiculo = placaVehiculo)
+            HistorialParqueo(puesto = puesto, username = "GUARDIA:$guardUsername", codigoTicket = codigoTicket, placaVehiculo = vehiclePlate)
         )
         logger.info("Parking space id=$id successfully force-occupied by guard '$guardUsername'. Ticket: $codigoTicket.")
         return puesto.toResponse()
@@ -141,18 +141,18 @@ class PuestoParqueoService(
         logger.info("${if (isGuard) "Guard" else "User"} '$username' is requesting to free parking space id=$id...")
         logger.info("Acquiring pessimistic lock on parking space id=$id...")
         val puesto = puestoParqueoRepository.findByIdWithPessimisticLock(id).orElseThrow {
-            PuestoParqueoNotFoundException("Puesto de parqueo $id no encontrado")
+            PuestoParqueoNotFoundException("Parking space $id not found")
         }
         if (puesto.estado == EstadoPuesto.DISPONIBLE) {
             logger.warn("Parking space id=$id is already available. Cannot free it again.")
-            throw SlotAlreadyAvailableException("El puesto $id ya está disponible")
+            throw SlotAlreadyAvailableException("Parking space $id is already available")
         }
         logger.info("Loading active history entry for parking space id=$id...")
         val historial = historialParqueoRepository.findFirstByPuestoIdAndFechaSalidaIsNullOrderByFechaIngresoDesc(id)
-            .orElseThrow { HistorialParqueoNotFoundException("Historial activo no encontrado para el puesto $id") }
+            .orElseThrow { HistorialParqueoNotFoundException("No active history found for space $id") }
         if (!isGuard && historial.username != username) {
             logger.warn("Unauthorized attempt: user '$username' tried to free space id=$id owned by '${historial.username}'.")
-            throw UnauthorizedAccessException("El usuario $username no está autorizado para liberar este puesto")
+            throw UnauthorizedAccessException("User $username is not authorized to free this space")
         }
         historial.fechaSalida = LocalDateTime.now()
         historialParqueoRepository.save(historial)

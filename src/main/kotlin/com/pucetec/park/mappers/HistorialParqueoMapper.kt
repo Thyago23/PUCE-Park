@@ -5,10 +5,10 @@ import com.pucetec.park.entities.HistorialParqueo
 
 fun HistorialParqueo.toResponse() = HistorialParqueoResponse(
     id = this.id,
-    codigoTicket = this.codigoTicket,
+    ticketCode = this.codigoTicket,
     username = this.username,
-    fechaIngreso = this.fechaIngreso,
-    fechaSalida = this.fechaSalida,
-    placaVehiculo = this.placaVehiculo,
-    puesto = this.puesto!!.toResponse()
+    entryDate = this.fechaIngreso,
+    exitDate = this.fechaSalida,
+    vehiclePlate = this.placaVehiculo,
+    space = this.puesto!!.toResponse()
 )

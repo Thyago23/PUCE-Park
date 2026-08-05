@@ -1,25 +1,25 @@
 package com.pucetec.park.dto
 
 data class EstadisticasZonaResponse(
-    val zonaId: Long,
-    val zonaNombre: String,
-    val capacidadMaxima: Int,
-    val disponibles: Long,
-    val ocupados: Long,
+    val zoneId: Long,
+    val zoneName: String,
+    val maxCapacity: Int,
+    val available: Long,
+    val occupied: Long,
     val total: Long
 )
 
 data class EstadisticasPersonalesResponse(
-    val mes: String,
-    val totalSesiones: Long,
-    val totalHoras: Double,
-    val promedioHorasPorSesion: Double
+    val month: String,
+    val totalSessions: Long,
+    val totalHours: Double,
+    val avgHoursPerSession: Double
 )
 
 data class RankingEntradaResponse(
-    val posicion: Int,
+    val position: Int,
     val username: String,
-    val nombreCompleto: String,
-    val totalHoras: Double,
-    val totalSesiones: Long
+    val fullName: String,
+    val totalHours: Double,
+    val totalSessions: Long
 )

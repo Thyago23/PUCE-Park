@@ -6,8 +6,8 @@ import com.pucetec.park.entities.PerfilUsuario
 fun PerfilUsuario.toResponse() = PerfilUsuarioResponse(
     id = this.id,
     username = this.username,
-    nombreCompleto = this.nombreCompleto,
-    placaVehiculo = this.placaVehiculo,
-    numeroPermiso = this.numeroPermiso ?: "",
-    modoOscuro = this.modoOscuro
+    fullName = this.nombreCompleto,
+    vehiclePlate = this.placaVehiculo,
+    permitNumber = this.numeroPermiso ?: "",
+    darkMode = this.modoOscuro
 )

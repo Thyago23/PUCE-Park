@@ -31,7 +31,7 @@ class ZonaParqueoController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createZona(@RequestBody request: CreateZonaParqueoRequest): ZonaParqueoResponse {
-        logger.info("POST /api/v1/zonas - nombre=${request.nombre}")
+        logger.info("POST /api/v1/zonas - name=${request.name}")
         return zonaParqueoService.createZona(request)
     }
 

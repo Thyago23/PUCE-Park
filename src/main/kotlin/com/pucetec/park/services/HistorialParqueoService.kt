@@ -40,7 +40,7 @@ class HistorialParqueoService(
         logger.info("Loading parking history for space id=$puestoId...")
         if (!puestoParqueoRepository.existsById(puestoId)) {
             logger.warn("Parking space id=$puestoId not found.")
-            throw PuestoParqueoNotFoundException("Puesto de parqueo $puestoId no encontrado")
+            throw PuestoParqueoNotFoundException("Parking space $puestoId not found")
         }
         val historial = historialParqueoRepository.findByPuestoIdOrderByFechaIngresoDesc(puestoId)
         logger.info("Found ${historial.size} history record(s) for parking space id=$puestoId.")
@@ -53,15 +53,15 @@ class HistorialParqueoService(
         val yearMonth = YearMonth.parse(mes)
         logger.info("Querying database for stats: year=${yearMonth.year}, month=${yearMonth.monthValue}...")
         val stats = historialParqueoRepository.getEstadisticasPersonales(username, yearMonth.year, yearMonth.monthValue)
-        val totalHoras = stats.getTotalHoras() ?: 0.0
-        val totalSesiones = stats.getTotalSesiones()
-        val promedio = if (totalSesiones > 0) totalHoras / totalSesiones else 0.0
-        logger.info("Stats for '$username' in $mes: sessions=$totalSesiones, totalHours=$totalHoras, avgHoursPerSession=$promedio.")
+        val totalHours = stats.getTotalHoras() ?: 0.0
+        val totalSessions = stats.getTotalSesiones()
+        val avg = if (totalSessions > 0) totalHours / totalSessions else 0.0
+        logger.info("Stats for '$username' in $mes: sessions=$totalSessions, totalHours=$totalHours, avgHoursPerSession=$avg.")
         return EstadisticasPersonalesResponse(
-            mes = mes,
-            totalSesiones = totalSesiones,
-            totalHoras = Math.round(totalHoras * 100.0) / 100.0,
-            promedioHorasPorSesion = Math.round(promedio * 100.0) / 100.0
+            month = mes,
+            totalSessions = totalSessions,
+            totalHours = Math.round(totalHours * 100.0) / 100.0,
+            avgHoursPerSession = Math.round(avg * 100.0) / 100.0
         )
     }
 
@@ -74,11 +74,11 @@ class HistorialParqueoService(
         logger.info("Ranking loaded: ${entries.size} user(s) found for $mes.")
         return entries.mapIndexed { index, entry ->
             RankingEntradaResponse(
-                posicion = index + 1,
+                position = index + 1,
                 username = entry.getUsername(),
-                nombreCompleto = entry.getNombreCompleto() ?: entry.getUsername(),
-                totalHoras = Math.round(entry.getTotalHoras() * 100.0) / 100.0,
-                totalSesiones = entry.getTotalSesiones()
+                fullName = entry.getNombreCompleto() ?: entry.getUsername(),
+                totalHours = Math.round(entry.getTotalHoras() * 100.0) / 100.0,
+                totalSessions = entry.getTotalSesiones()
             )
         }
     }

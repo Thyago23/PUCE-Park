@@ -4,10 +4,10 @@ import java.time.LocalDateTime
 
 data class HistorialParqueoResponse(
     val id: Long,
-    val codigoTicket: String,
+    val ticketCode: String,
     val username: String,
-    val fechaIngreso: LocalDateTime,
-    val fechaSalida: LocalDateTime?,
-    val placaVehiculo: String?,
-    val puesto: PuestoParqueoResponse
+    val entryDate: LocalDateTime,
+    val exitDate: LocalDateTime?,
+    val vehiclePlate: String?,
+    val space: PuestoParqueoResponse
 )

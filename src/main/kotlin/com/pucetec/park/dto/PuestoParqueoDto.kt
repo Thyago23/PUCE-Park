@@ -3,25 +3,25 @@ package com.pucetec.park.dto
 import com.pucetec.park.entities.EstadoPuesto
 
 data class CreatePuestoParqueoRequest(
-    val zonaId: Long,
-    val numeroPuesto: String,
-    val fila: String,
-    val orden: Int
+    val zoneId: Long,
+    val spaceNumber: String,
+    val row: String,
+    val order: Int
 )
 
 data class UpdatePuestoParqueoRequest(
-    val numeroPuesto: String
+    val spaceNumber: String
 )
 
 data class ForzarOcupacionRequest(
-    val placaVehiculo: String
+    val vehiclePlate: String
 )
 
 data class PuestoParqueoResponse(
     val id: Long,
-    val numeroPuesto: String,
-    val fila: String,
-    val orden: Int,
-    val estado: EstadoPuesto,
-    val zona: ZonaParqueoResponse
+    val spaceNumber: String,
+    val row: String,
+    val order: Int,
+    val status: EstadoPuesto,
+    val zone: ZonaParqueoResponse
 )

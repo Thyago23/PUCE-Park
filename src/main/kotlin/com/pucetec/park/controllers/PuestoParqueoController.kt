@@ -33,13 +33,13 @@ class PuestoParqueoController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createPuesto(@RequestBody request: CreatePuestoParqueoRequest): PuestoParqueoResponse {
-        logger.info("POST /api/v1/puestos - numeroPuesto=${request.numeroPuesto}")
+        logger.info("POST /api/v1/puestos - spaceNumber=${request.spaceNumber}")
         return puestoParqueoService.createPuesto(request)
     }
 
     @PutMapping("/{id}")
     fun updatePuesto(@PathVariable id: Long, @RequestBody request: UpdatePuestoParqueoRequest): PuestoParqueoResponse {
-        logger.info("PUT /api/v1/puestos/$id - numeroPuesto=${request.numeroPuesto}")
+        logger.info("PUT /api/v1/puestos/$id - spaceNumber=${request.spaceNumber}")
         return puestoParqueoService.updatePuesto(id, request)
     }
 
@@ -67,7 +67,7 @@ class PuestoParqueoController(
     @PutMapping("/{id}/forzar-ocupacion")
     fun forzarOcupacion(@PathVariable id: Long, @RequestBody request: ForzarOcupacionRequest, @AuthenticationPrincipal jwt: Jwt): PuestoParqueoResponse {
         val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
-        logger.info("PUT /api/v1/puestos/$id/forzar-ocupacion - placa=${request.placaVehiculo}, username=$username")
-        return puestoParqueoService.forzarOcupacion(id, request.placaVehiculo, username)
+        logger.info("PUT /api/v1/puestos/$id/forzar-ocupacion - vehiclePlate=${request.vehiclePlate}, username=$username")
+        return puestoParqueoService.forzarOcupacion(id, request.vehiclePlate, username)
     }
 }

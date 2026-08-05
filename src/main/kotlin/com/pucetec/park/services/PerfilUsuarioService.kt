@@ -36,13 +36,13 @@ class PerfilUsuarioService(
     fun getEstadoPerfil(username: String): PerfilEstadoResponse {
         logger.info("Checking profile completeness for user '$username'...")
         val perfil = perfilUsuarioRepository.findByUsername(username).orElse(null)
-        val faltante = mutableListOf<String>()
-        if (perfil == null || perfil.nombreCompleto.isBlank()) faltante.add("nombreCompleto")
-        if (perfil == null || perfil.placaVehiculo.isBlank()) faltante.add("placaVehiculo")
-        if (perfil == null || perfil.numeroPermiso.isNullOrBlank()) faltante.add("numeroPermiso")
-        val completo = faltante.isEmpty()
-        logger.info("Profile completeness for '$username': complete=$completo, missing=$faltante.")
-        return PerfilEstadoResponse(completo = completo, faltante = faltante)
+        val missing = mutableListOf<String>()
+        if (perfil == null || perfil.nombreCompleto.isBlank()) missing.add("fullName")
+        if (perfil == null || perfil.placaVehiculo.isBlank()) missing.add("vehiclePlate")
+        if (perfil == null || perfil.numeroPermiso.isNullOrBlank()) missing.add("permitNumber")
+        val complete = missing.isEmpty()
+        logger.info("Profile completeness for '$username': complete=$complete, missing=$missing.")
+        return PerfilEstadoResponse(complete = complete, missing = missing)
     }
 
     @Transactional
@@ -52,11 +52,11 @@ class PerfilUsuarioService(
             logger.info("No existing profile for '$username'. Creating new one before updating...")
             PerfilUsuario(username = username)
         }
-        logger.info("Applying changes to profile '$username': fullName='${request.nombreCompleto}', plate='${request.placaVehiculo}'...")
-        perfil.nombreCompleto = request.nombreCompleto
-        perfil.placaVehiculo = request.placaVehiculo
-        perfil.numeroPermiso = request.numeroPermiso
-        perfil.modoOscuro = request.modoOscuro
+        logger.info("Applying changes to profile '$username': fullName='${request.fullName}', plate='${request.vehiclePlate}'...")
+        perfil.nombreCompleto = request.fullName
+        perfil.placaVehiculo = request.vehiclePlate
+        perfil.numeroPermiso = request.permitNumber
+        perfil.modoOscuro = request.darkMode
         logger.info("Saving updated profile for '$username'...")
         val saved = perfilUsuarioRepository.save(perfil)
         logger.info("Profile for '$username' updated successfully (id=${saved.id}).")
