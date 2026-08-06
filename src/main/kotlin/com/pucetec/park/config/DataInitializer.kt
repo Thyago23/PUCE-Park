@@ -22,19 +22,20 @@ class DataInitializer(
     private data class ZonaDef(val nombre: String, val descripcion: String, val ubicacion: String, val filas: List<FilaDef>)
     private data class FilaDef(val fila: String, val numeros: List<String>)
 
+    // Genera 3 filas (A, B, C) de 10 puestos = 30 por zona.
+    private fun filas30(prefijo: String): List<FilaDef> {
+        val nums = (1..30).map { "$prefijo-${it.toString().padStart(2, '0')}" }
+        return listOf(
+            FilaDef("A", nums.subList(0, 10)),
+            FilaDef("B", nums.subList(10, 20)),
+            FilaDef("C", nums.subList(20, 30)),
+        )
+    }
+
     private val zonas = listOf(
-        ZonaDef("Zona A", "Zona norte - edificio principal", "Bloque A, planta baja", listOf(
-            FilaDef("A", listOf("A-01","A-02","A-03","A-04","A-05")),
-            FilaDef("B", listOf("A-06","A-07","A-08","A-09","A-10")),
-        )),
-        ZonaDef("Zona B", "Zona sur - biblioteca", "Bloque B, planta baja", listOf(
-            FilaDef("A", listOf("B-01","B-02","B-03","B-04","B-05")),
-            FilaDef("B", listOf("B-06","B-07","B-08","B-09","B-10")),
-        )),
-        ZonaDef("Zona C", "Zona este - laboratorios", "Bloque C, lateral derecho", listOf(
-            FilaDef("A", listOf("C-01","C-02","C-03","C-04","C-05")),
-            FilaDef("B", listOf("C-06","C-07","C-08","C-09","C-10")),
-        )),
+        ZonaDef("Zona A", "Zona norte - edificio principal", "Bloque A, planta baja", filas30("A")),
+        ZonaDef("Zona B", "Zona sur - biblioteca", "Bloque B, planta baja", filas30("B")),
+        ZonaDef("Zona C", "Zona este - laboratorios", "Bloque C, lateral derecho", filas30("C")),
     )
 
     @Transactional
