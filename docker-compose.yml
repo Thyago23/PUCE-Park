@@ -60,7 +60,23 @@ services:
       - park_net
     restart: unless-stopped
 
-  # ── Nginx: reverse proxy + balanceo ───────────────────────────────────────────
+  # ── Microservicio: Usuarios / Perfiles ────────────────────────────────────────
+  users-service:
+    build: ./users-service
+    container_name: puce_users_backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_micro:5432/puce_micro
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      db_micro:
+        condition: service_healthy
+    networks:
+      - park_net
+    restart: unless-stopped
+
+  # ── Nginx: reverse proxy ──────────────────────────────────────────────────────
   nginx:
     image: nginx:alpine
     container_name: puce_nginx
@@ -70,6 +86,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - park-app
+      - users-service
     networks:
       - park_net
     restart: unless-stopped
