@@ -8,6 +8,7 @@ import com.pucetec.park.exceptions.*
 import com.pucetec.park.services.PuestoParqueoService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
@@ -29,18 +30,33 @@ class PuestoParqueoControllerTest {
     @MockitoBean private lateinit var puestoParqueoService: PuestoParqueoService
     @MockitoBean private lateinit var jwtDecoder: JwtDecoder
 
-    private val zonaResponse = ZonaParqueoResponse(id = 1L, nombre = "Zona A", descripcion = "", capacidadMaxima = 10)
-    private val puestoResponse = PuestoParqueoResponse(id = 1L, numeroPuesto = "A01", estado = EstadoPuesto.DISPONIBLE, zona = zonaResponse)
-    private val puestoOcupadoResponse = puestoResponse.copy(estado = EstadoPuesto.OCUPADO)
+    private val zonaResponse = ZonaParqueoResponse(
+        id = 1L, name = "Zona A", description = "", location = "", maxCapacity = 10,
+        availableSpaces = 9, occupiedSpaces = 1, totalSpaces = 10
+    )
+    private val puestoResponse = PuestoParqueoResponse(
+        id = 1L, spaceNumber = "A01", row = "A", order = 1,
+        status = EstadoPuesto.DISPONIBLE, zone = zonaResponse
+    )
+    private val puestoOcupadoResponse = puestoResponse.copy(status = EstadoPuesto.OCUPADO)
+
+    private val createBody = """{"zoneId":1,"spaceNumber":"A01","row":"A","order":1}"""
+    private val updateBody = """{"spaceNumber":"A01-MOD"}"""
 
     @Test
-    fun `GET puestos por zona responde 200 sin token por ser publico`() {
+    fun `GET puestos por zona con token responde 200`() {
         whenever(puestoParqueoService.getPuestosByZona(1L)).thenReturn(listOf(puestoResponse))
 
-        mockMvc.perform(get("/api/v1/puestos/zona/1"))
+        mockMvc.perform(get("/api/v1/puestos/zona/1").with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER"))))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$[0].numeroPuesto").value("A01"))
-            .andExpect(jsonPath("$[0].estado").value("DISPONIBLE"))
+            .andExpect(jsonPath("$[0].spaceNumber").value("A01"))
+            .andExpect(jsonPath("$[0].status").value("DISPONIBLE"))
+    }
+
+    @Test
+    fun `GET puestos por zona sin token responde 401`() {
+        mockMvc.perform(get("/api/v1/puestos/zona/1"))
+            .andExpect(status().isUnauthorized)
     }
 
     @Test
@@ -48,17 +64,17 @@ class PuestoParqueoControllerTest {
         mockMvc.perform(
             post("/api/v1/puestos")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"zonaId":1,"numeroPuesto":"A01"}""")
+                .content(createBody)
         ).andExpect(status().isUnauthorized)
     }
 
     @Test
-    fun `POST puestos con rol DRIVER responde 403`() {
+    fun `POST puestos con rol USER responde 403`() {
         mockMvc.perform(
             post("/api/v1/puestos")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"zonaId":1,"numeroPuesto":"A01"}""")
+                .content(createBody)
         ).andExpect(status().isForbidden)
     }
 
@@ -70,9 +86,9 @@ class PuestoParqueoControllerTest {
             post("/api/v1/puestos")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"zonaId":1,"numeroPuesto":"A01"}""")
+                .content(createBody)
         ).andExpect(status().isCreated)
-            .andExpect(jsonPath("$.numeroPuesto").value("A01"))
+            .andExpect(jsonPath("$.spaceNumber").value("A01"))
     }
 
     @Test
@@ -84,7 +100,7 @@ class PuestoParqueoControllerTest {
             post("/api/v1/puestos")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"zonaId":1,"numeroPuesto":"A11"}""")
+                .content("""{"zoneId":1,"spaceNumber":"A11","row":"B","order":11}""")
         ).andExpect(status().isConflict)
     }
 
@@ -93,17 +109,17 @@ class PuestoParqueoControllerTest {
         mockMvc.perform(
             put("/api/v1/puestos/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"numeroPuesto":"A01-MOD"}""")
+                .content(updateBody)
         ).andExpect(status().isUnauthorized)
     }
 
     @Test
-    fun `PUT puestos update con rol DRIVER responde 403`() {
+    fun `PUT puestos update con rol USER responde 403`() {
         mockMvc.perform(
             put("/api/v1/puestos/1")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"numeroPuesto":"A01-MOD"}""")
+                .content(updateBody)
         ).andExpect(status().isForbidden)
     }
 
@@ -115,7 +131,7 @@ class PuestoParqueoControllerTest {
             put("/api/v1/puestos/1")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"numeroPuesto":"A01-MOD"}""")
+                .content(updateBody)
         ).andExpect(status().isOk)
     }
 
@@ -126,32 +142,34 @@ class PuestoParqueoControllerTest {
     }
 
     @Test
-    fun `PUT ocupar con rol ADMIN responde 403`() {
+    fun `PUT ocupar con rol ADMIN responde 200`() {
+        whenever(puestoParqueoService.ocuparPuesto(any(), any(), anyOrNull())).thenReturn(puestoOcupadoResponse)
+
         mockMvc.perform(
             put("/api/v1/puestos/1/ocupar")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
-        ).andExpect(status().isForbidden)
+        ).andExpect(status().isOk)
     }
 
     @Test
-    fun `PUT ocupar con rol DRIVER responde 200`() {
-        whenever(puestoParqueoService.ocuparPuesto(any(), any())).thenReturn(puestoOcupadoResponse)
+    fun `PUT ocupar con rol USER responde 200`() {
+        whenever(puestoParqueoService.ocuparPuesto(any(), any(), anyOrNull())).thenReturn(puestoOcupadoResponse)
 
         mockMvc.perform(
             put("/api/v1/puestos/1/ocupar")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
         ).andExpect(status().isOk)
-            .andExpect(jsonPath("$.estado").value("OCUPADO"))
+            .andExpect(jsonPath("$.status").value("OCUPADO"))
     }
 
     @Test
     fun `PUT ocupar responde 409 cuando puesto ya esta ocupado`() {
-        whenever(puestoParqueoService.ocuparPuesto(any(), any()))
+        whenever(puestoParqueoService.ocuparPuesto(any(), any(), anyOrNull()))
             .thenAnswer { throw SlotAlreadyOccupiedException("Puesto ya ocupado") }
 
         mockMvc.perform(
             put("/api/v1/puestos/1/ocupar")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
         ).andExpect(status().isConflict)
     }
 
@@ -162,12 +180,12 @@ class PuestoParqueoControllerTest {
     }
 
     @Test
-    fun `PUT liberar con rol DRIVER responde 200`() {
+    fun `PUT liberar con rol USER responde 200`() {
         whenever(puestoParqueoService.liberarPuesto(any(), any(), any())).thenReturn(puestoResponse)
 
         mockMvc.perform(
             put("/api/v1/puestos/1/liberar")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
         ).andExpect(status().isOk)
     }
 
@@ -178,7 +196,7 @@ class PuestoParqueoControllerTest {
 
         mockMvc.perform(
             put("/api/v1/puestos/1/liberar")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
         ).andExpect(status().isConflict)
     }
 
@@ -189,10 +207,10 @@ class PuestoParqueoControllerTest {
     }
 
     @Test
-    fun `PUT forzar-liberacion con rol DRIVER responde 403`() {
+    fun `PUT forzar-liberacion con rol USER responde 403`() {
         mockMvc.perform(
             put("/api/v1/puestos/1/forzar-liberacion")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
         ).andExpect(status().isForbidden)
     }
 

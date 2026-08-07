@@ -32,18 +32,18 @@ class PuestoParqueoServiceTest {
 
     @Test
     fun `getPuestosByZona retorna lista de PuestoParqueoResponse`() {
-        whenever(puestoParqueoRepository.findByZonaId(1L)).thenReturn(listOf(puestoDisponible))
+        whenever(puestoParqueoRepository.findByZonaIdOrderByFilaAscOrdenAsc(1L)).thenReturn(listOf(puestoDisponible))
 
         val result = puestoParqueoService.getPuestosByZona(1L)
 
         assertEquals(1, result.size)
-        assertEquals("A01", result[0].numeroPuesto)
-        assertEquals(EstadoPuesto.DISPONIBLE, result[0].estado)
+        assertEquals("A01", result[0].spaceNumber)
+        assertEquals(EstadoPuesto.DISPONIBLE, result[0].status)
     }
 
     @Test
     fun `createPuesto guarda y retorna el puesto cuando los datos son validos`() {
-        val request = CreatePuestoParqueoRequest(zonaId = 1L, numeroPuesto = "A01")
+        val request = CreatePuestoParqueoRequest(zoneId = 1L, spaceNumber = "A01", row = "A", order = 1)
         whenever(zonaParqueoRepository.findById(1L)).thenReturn(Optional.of(zona))
         whenever(puestoParqueoRepository.existsByNumeroPuestoAndZonaId("A01", 1L)).thenReturn(false)
         whenever(puestoParqueoRepository.countByZonaId(1L)).thenReturn(3L)
@@ -51,14 +51,14 @@ class PuestoParqueoServiceTest {
 
         val result = puestoParqueoService.createPuesto(request)
 
-        assertEquals("A01", result.numeroPuesto)
-        assertEquals(EstadoPuesto.DISPONIBLE, result.estado)
+        assertEquals("A01", result.spaceNumber)
+        assertEquals(EstadoPuesto.DISPONIBLE, result.status)
     }
 
     @Test
-    fun `createPuesto lanza BlankFieldException cuando numeroPuesto es blank`() {
+    fun `createPuesto lanza BlankFieldException cuando spaceNumber es blank`() {
         assertThrows<BlankFieldException> {
-            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zonaId = 1L, numeroPuesto = ""))
+            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zoneId = 1L, spaceNumber = "", row = "A", order = 1))
         }
     }
 
@@ -67,17 +67,17 @@ class PuestoParqueoServiceTest {
         whenever(zonaParqueoRepository.findById(99L)).thenReturn(Optional.empty())
 
         assertThrows<ZonaParqueoNotFoundException> {
-            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zonaId = 99L, numeroPuesto = "A01"))
+            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zoneId = 99L, spaceNumber = "A01", row = "A", order = 1))
         }
     }
 
     @Test
-    fun `createPuesto lanza NumeroPuestoDuplicadoException cuando numeroPuesto ya existe en la zona`() {
+    fun `createPuesto lanza NumeroPuestoDuplicadoException cuando spaceNumber ya existe en la zona`() {
         whenever(zonaParqueoRepository.findById(1L)).thenReturn(Optional.of(zona))
         whenever(puestoParqueoRepository.existsByNumeroPuestoAndZonaId("A01", 1L)).thenReturn(true)
 
         assertThrows<NumeroPuestoDuplicadoException> {
-            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zonaId = 1L, numeroPuesto = "A01"))
+            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zoneId = 1L, spaceNumber = "A01", row = "A", order = 1))
         }
     }
 
@@ -88,13 +88,13 @@ class PuestoParqueoServiceTest {
         whenever(puestoParqueoRepository.countByZonaId(1L)).thenReturn(10L)
 
         assertThrows<ZonaParqueoLlenaException> {
-            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zonaId = 1L, numeroPuesto = "A11"))
+            puestoParqueoService.createPuesto(CreatePuestoParqueoRequest(zoneId = 1L, spaceNumber = "A11", row = "B", order = 11))
         }
     }
 
     @Test
-    fun `updatePuesto actualiza el numeroPuesto cuando los datos son validos`() {
-        val request = UpdatePuestoParqueoRequest(numeroPuesto = "A01-MOD")
+    fun `updatePuesto actualiza el spaceNumber cuando los datos son validos`() {
+        val request = UpdatePuestoParqueoRequest(spaceNumber = "A01-MOD")
         whenever(puestoParqueoRepository.findById(1L)).thenReturn(Optional.of(puestoDisponible))
         whenever(puestoParqueoRepository.existsByNumeroPuestoAndZonaIdAndIdNot("A01-MOD", 1L, 1L)).thenReturn(false)
         whenever(puestoParqueoRepository.save(any())).thenReturn(
@@ -103,7 +103,7 @@ class PuestoParqueoServiceTest {
 
         val result = puestoParqueoService.updatePuesto(1L, request)
 
-        assertEquals("A01-MOD", result.numeroPuesto)
+        assertEquals("A01-MOD", result.spaceNumber)
     }
 
     @Test
@@ -111,26 +111,26 @@ class PuestoParqueoServiceTest {
         whenever(puestoParqueoRepository.findById(99L)).thenReturn(Optional.empty())
 
         assertThrows<PuestoParqueoNotFoundException> {
-            puestoParqueoService.updatePuesto(99L, UpdatePuestoParqueoRequest(numeroPuesto = "X"))
+            puestoParqueoService.updatePuesto(99L, UpdatePuestoParqueoRequest(spaceNumber = "X"))
         }
     }
 
     @Test
-    fun `updatePuesto lanza BlankFieldException cuando numeroPuesto es blank`() {
+    fun `updatePuesto lanza BlankFieldException cuando spaceNumber es blank`() {
         whenever(puestoParqueoRepository.findById(1L)).thenReturn(Optional.of(puestoDisponible))
 
         assertThrows<BlankFieldException> {
-            puestoParqueoService.updatePuesto(1L, UpdatePuestoParqueoRequest(numeroPuesto = "   "))
+            puestoParqueoService.updatePuesto(1L, UpdatePuestoParqueoRequest(spaceNumber = "   "))
         }
     }
 
     @Test
-    fun `updatePuesto lanza NumeroPuestoDuplicadoException cuando numeroPuesto ya existe en la zona`() {
+    fun `updatePuesto lanza NumeroPuestoDuplicadoException cuando spaceNumber ya existe en la zona`() {
         whenever(puestoParqueoRepository.findById(1L)).thenReturn(Optional.of(puestoDisponible))
         whenever(puestoParqueoRepository.existsByNumeroPuestoAndZonaIdAndIdNot("A02", 1L, 1L)).thenReturn(true)
 
         assertThrows<NumeroPuestoDuplicadoException> {
-            puestoParqueoService.updatePuesto(1L, UpdatePuestoParqueoRequest(numeroPuesto = "A02"))
+            puestoParqueoService.updatePuesto(1L, UpdatePuestoParqueoRequest(spaceNumber = "A02"))
         }
     }
 
@@ -144,7 +144,7 @@ class PuestoParqueoServiceTest {
 
         val result = puestoParqueoService.ocuparPuesto(1L, "jdoe")
 
-        assertEquals(EstadoPuesto.OCUPADO, result.estado)
+        assertEquals(EstadoPuesto.OCUPADO, result.status)
     }
 
     @Test
@@ -176,7 +176,7 @@ class PuestoParqueoServiceTest {
 
         val result = puestoParqueoService.liberarPuesto(2L, "jdoe", isGuard = false)
 
-        assertEquals(EstadoPuesto.DISPONIBLE, result.estado)
+        assertEquals(EstadoPuesto.DISPONIBLE, result.status)
     }
 
     @Test
@@ -231,6 +231,6 @@ class PuestoParqueoServiceTest {
 
         val result = puestoParqueoService.liberarPuesto(2L, "guardia1", isGuard = true)
 
-        assertEquals(EstadoPuesto.DISPONIBLE, result.estado)
+        assertEquals(EstadoPuesto.DISPONIBLE, result.status)
     }
 }
