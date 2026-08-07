@@ -38,8 +38,7 @@ class SecurityConfig {
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/guardia/me").hasAnyRole("ADMIN", "GUARD")
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/ranking/mensual").hasAnyRole("ADMIN", "GUARD", "USER")
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/historial/puesto/*").hasAnyRole("ADMIN", "GUARD")
-                // Perfil
-                auth.requestMatchers("/api/v1/perfil/me", "/api/v1/perfil/me/estado").hasAnyRole("ADMIN", "GUARD", "USER")
+                // El perfil de usuario vive en el microservicio 'users-service' (/users/me)
                 auth.anyRequest().authenticated()
             }
             .oauth2ResourceServer { oauth2 ->

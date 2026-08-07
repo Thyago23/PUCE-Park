@@ -24,4 +24,7 @@ class UserProfile(
 
     @Column(name = "permit_number", length = 20, unique = true, nullable = true)
     var permitNumber: String? = null,
+
+    @Column(name = "dark_mode", nullable = false)
+    var darkMode: Boolean = false,
 )

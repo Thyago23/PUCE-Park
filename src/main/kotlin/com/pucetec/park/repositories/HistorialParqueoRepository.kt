@@ -40,18 +40,19 @@ interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
         @Param("month") month: Int
     ): EstadisticasPersonalesProjection
 
+    // El nombre completo vive en el microservicio users-service (patrón sin BD
+    // compartida ni joins entre servicios); el ranking usa solo el username.
     @Query(value = """
         SELECT h.username as username,
-               COALESCE(p.full_name, h.username) as nombre_completo,
+               COALESCE(MAX(h.display_name), h.username) as nombre_completo,
                COALESCE(SUM(EXTRACT(EPOCH FROM (h.exit_date - h.entry_date)) / 3600.0), 0) as total_horas,
                COUNT(h.id) as total_sesiones
         FROM parking_history h
-        LEFT JOIN user_profiles p ON p.username = h.username
         WHERE h.exit_date IS NOT NULL
           AND h.username NOT LIKE 'GUARDIA:%'
           AND EXTRACT(YEAR FROM h.entry_date) = :year
           AND EXTRACT(MONTH FROM h.entry_date) = :month
-        GROUP BY h.username, p.full_name
+        GROUP BY h.username
         ORDER BY total_horas DESC
         LIMIT 20
     """, nativeQuery = true)

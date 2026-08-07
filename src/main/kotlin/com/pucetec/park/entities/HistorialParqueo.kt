@@ -27,5 +27,9 @@ class HistorialParqueo(
     var fechaSalida: LocalDateTime? = null,
 
     @Column(name = "vehicle_plate", length = 15)
-    val placaVehiculo: String? = null
+    val placaVehiculo: String? = null,
+
+    // Nombre para mostrar (denormalizado desde users-service al ocupar) — para el ranking
+    @Column(name = "display_name", length = 100)
+    val nombreMostrar: String? = null
 )

@@ -2,6 +2,7 @@ package com.pucetec.park.controllers
 
 import com.pucetec.park.dto.CreatePuestoParqueoRequest
 import com.pucetec.park.dto.ForzarOcupacionRequest
+import com.pucetec.park.dto.OcuparPuestoRequest
 import com.pucetec.park.dto.PuestoParqueoResponse
 import com.pucetec.park.dto.UpdatePuestoParqueoRequest
 import com.pucetec.park.services.PuestoParqueoService
@@ -44,10 +45,16 @@ class PuestoParqueoController(
     }
 
     @PutMapping("/{id}/ocupar")
-    fun ocuparPuesto(@PathVariable id: Long, @AuthenticationPrincipal jwt: Jwt): PuestoParqueoResponse {
+    fun ocuparPuesto(
+        @PathVariable id: Long,
+        @RequestBody(required = false) request: OcuparPuestoRequest?,
+        @AuthenticationPrincipal jwt: Jwt
+    ): PuestoParqueoResponse {
         val username = jwt.getClaimAsString("username") ?: jwt.getClaimAsString("cognito:username") ?: jwt.subject
-        logger.info("PUT /api/v1/puestos/$id/ocupar - username=$username")
-        return puestoParqueoService.ocuparPuesto(id, username)
+        val displayName = request?.fullName?.takeIf { it.isNotBlank() }
+            ?: jwt.getClaimAsString("name")
+        logger.info("PUT /api/v1/puestos/$id/ocupar - username=$username, displayName=$displayName")
+        return puestoParqueoService.ocuparPuesto(id, username, displayName)
     }
 
     @PutMapping("/{id}/liberar")
