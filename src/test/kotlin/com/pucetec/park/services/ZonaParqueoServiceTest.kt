@@ -34,49 +34,49 @@ class ZonaParqueoServiceTest {
         val result = zonaParqueoService.getAllZonas()
 
         assertEquals(1, result.size)
-        assertEquals("Zona A", result[0].nombre)
-        assertEquals(10, result[0].capacidadMaxima)
+        assertEquals("Zona A", result[0].name)
+        assertEquals(10, result[0].maxCapacity)
     }
 
     @Test
     fun `createZona guarda y retorna la zona cuando los datos son validos`() {
-        val request = CreateZonaParqueoRequest(nombre = "Zona B", descripcion = "", capacidadMaxima = 5)
+        val request = CreateZonaParqueoRequest(name = "Zona B", description = "", maxCapacity = 5)
         val guardada = ZonaParqueo(id = 2L, nombre = "Zona B", descripcion = "", capacidadMaxima = 5)
         whenever(zonaParqueoRepository.existsByNombre("Zona B")).thenReturn(false)
         whenever(zonaParqueoRepository.save(any())).thenReturn(guardada)
 
         val result = zonaParqueoService.createZona(request)
 
-        assertEquals("Zona B", result.nombre)
-        assertEquals(5, result.capacidadMaxima)
+        assertEquals("Zona B", result.name)
+        assertEquals(5, result.maxCapacity)
     }
 
     @Test
-    fun `createZona lanza BlankFieldException cuando nombre es blank`() {
+    fun `createZona lanza BlankFieldException cuando name es blank`() {
         assertThrows<BlankFieldException> {
-            zonaParqueoService.createZona(CreateZonaParqueoRequest(nombre = "  ", capacidadMaxima = 5))
+            zonaParqueoService.createZona(CreateZonaParqueoRequest(name = "  ", maxCapacity = 5))
         }
     }
 
     @Test
-    fun `createZona lanza InvalidCapacityException cuando capacidadMaxima es menor a 1`() {
+    fun `createZona lanza InvalidCapacityException cuando maxCapacity es menor a 1`() {
         assertThrows<InvalidCapacityException> {
-            zonaParqueoService.createZona(CreateZonaParqueoRequest(nombre = "Zona C", capacidadMaxima = 0))
+            zonaParqueoService.createZona(CreateZonaParqueoRequest(name = "Zona C", maxCapacity = 0))
         }
     }
 
     @Test
-    fun `createZona lanza ZonaParqueoNombreDuplicadoException cuando nombre ya existe`() {
+    fun `createZona lanza ZonaParqueoNombreDuplicadoException cuando name ya existe`() {
         whenever(zonaParqueoRepository.existsByNombre("Zona A")).thenReturn(true)
 
         assertThrows<ZonaParqueoNombreDuplicadoException> {
-            zonaParqueoService.createZona(CreateZonaParqueoRequest(nombre = "Zona A", capacidadMaxima = 5))
+            zonaParqueoService.createZona(CreateZonaParqueoRequest(name = "Zona A", maxCapacity = 5))
         }
     }
 
     @Test
     fun `updateZona actualiza y retorna la zona cuando los datos son validos`() {
-        val request = UpdateZonaParqueoRequest(nombre = "Zona A Mod", descripcion = "Nueva desc", capacidadMaxima = 15)
+        val request = UpdateZonaParqueoRequest(name = "Zona A Mod", description = "Nueva desc", maxCapacity = 15)
         whenever(zonaParqueoRepository.findById(1L)).thenReturn(Optional.of(zonaGuardada))
         whenever(zonaParqueoRepository.existsByNombreAndIdNot("Zona A Mod", 1L)).thenReturn(false)
         whenever(zonaParqueoRepository.save(any())).thenReturn(
@@ -85,8 +85,8 @@ class ZonaParqueoServiceTest {
 
         val result = zonaParqueoService.updateZona(1L, request)
 
-        assertEquals("Zona A Mod", result.nombre)
-        assertEquals(15, result.capacidadMaxima)
+        assertEquals("Zona A Mod", result.name)
+        assertEquals(15, result.maxCapacity)
     }
 
     @Test
@@ -94,35 +94,35 @@ class ZonaParqueoServiceTest {
         whenever(zonaParqueoRepository.findById(99L)).thenReturn(Optional.empty())
 
         assertThrows<ZonaParqueoNotFoundException> {
-            zonaParqueoService.updateZona(99L, UpdateZonaParqueoRequest(nombre = "X", capacidadMaxima = 5))
+            zonaParqueoService.updateZona(99L, UpdateZonaParqueoRequest(name = "X", maxCapacity = 5))
         }
     }
 
     @Test
-    fun `updateZona lanza BlankFieldException cuando nombre es blank`() {
+    fun `updateZona lanza BlankFieldException cuando name es blank`() {
         whenever(zonaParqueoRepository.findById(1L)).thenReturn(Optional.of(zonaGuardada))
 
         assertThrows<BlankFieldException> {
-            zonaParqueoService.updateZona(1L, UpdateZonaParqueoRequest(nombre = "", capacidadMaxima = 5))
+            zonaParqueoService.updateZona(1L, UpdateZonaParqueoRequest(name = "", maxCapacity = 5))
         }
     }
 
     @Test
-    fun `updateZona lanza InvalidCapacityException cuando capacidadMaxima es menor a 1`() {
+    fun `updateZona lanza InvalidCapacityException cuando maxCapacity es menor a 1`() {
         whenever(zonaParqueoRepository.findById(1L)).thenReturn(Optional.of(zonaGuardada))
 
         assertThrows<InvalidCapacityException> {
-            zonaParqueoService.updateZona(1L, UpdateZonaParqueoRequest(nombre = "Zona A", capacidadMaxima = -1))
+            zonaParqueoService.updateZona(1L, UpdateZonaParqueoRequest(name = "Zona A", maxCapacity = -1))
         }
     }
 
     @Test
-    fun `updateZona lanza ZonaParqueoNombreDuplicadoException cuando nombre ya pertenece a otra zona`() {
+    fun `updateZona lanza ZonaParqueoNombreDuplicadoException cuando name ya pertenece a otra zona`() {
         whenever(zonaParqueoRepository.findById(1L)).thenReturn(Optional.of(zonaGuardada))
         whenever(zonaParqueoRepository.existsByNombreAndIdNot("Zona B", 1L)).thenReturn(true)
 
         assertThrows<ZonaParqueoNombreDuplicadoException> {
-            zonaParqueoService.updateZona(1L, UpdateZonaParqueoRequest(nombre = "Zona B", capacidadMaxima = 5))
+            zonaParqueoService.updateZona(1L, UpdateZonaParqueoRequest(name = "Zona B", maxCapacity = 5))
         }
     }
 
@@ -161,11 +161,11 @@ class ZonaParqueoServiceTest {
 
         val result = zonaParqueoService.getEstadisticas(1L)
 
-        assertEquals(1L, result.zonaId)
-        assertEquals("Zona A", result.zonaNombre)
-        assertEquals(10, result.capacidadMaxima)
-        assertEquals(7L, result.disponibles)
-        assertEquals(3L, result.ocupados)
+        assertEquals(1L, result.zoneId)
+        assertEquals("Zona A", result.zoneName)
+        assertEquals(10, result.maxCapacity)
+        assertEquals(7L, result.available)
+        assertEquals(3L, result.occupied)
         assertEquals(10L, result.total)
     }
 

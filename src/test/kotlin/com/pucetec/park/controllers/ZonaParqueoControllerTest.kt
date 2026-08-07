@@ -1,9 +1,7 @@
 package com.pucetec.park.controllers
 
 import com.pucetec.park.config.SecurityConfig
-import com.pucetec.park.dto.CreateZonaParqueoRequest
 import com.pucetec.park.dto.EstadisticasZonaResponse
-import com.pucetec.park.dto.UpdateZonaParqueoRequest
 import com.pucetec.park.dto.ZonaParqueoResponse
 import com.pucetec.park.exceptions.*
 import com.pucetec.park.services.ZonaParqueoService
@@ -30,30 +28,41 @@ class ZonaParqueoControllerTest {
     @MockitoBean private lateinit var zonaParqueoService: ZonaParqueoService
     @MockitoBean private lateinit var jwtDecoder: JwtDecoder
 
-    private val zonaResponse = ZonaParqueoResponse(id = 1L, nombre = "Zona A", descripcion = "", capacidadMaxima = 10)
+    private val zonaResponse = ZonaParqueoResponse(
+        id = 1L, name = "Zona A", description = "", location = "", maxCapacity = 10,
+        availableSpaces = 7, occupiedSpaces = 3, totalSpaces = 10
+    )
+
+    private val zonaBody = """{"name":"Zona A","maxCapacity":10}"""
 
     @Test
-    fun `GET zonas responde 200 sin token por ser publico`() {
+    fun `GET zonas con token responde 200`() {
         whenever(zonaParqueoService.getAllZonas()).thenReturn(listOf(zonaResponse))
 
-        mockMvc.perform(get("/api/v1/zonas"))
+        mockMvc.perform(get("/api/v1/zonas").with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER"))))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$[0].nombre").value("Zona A"))
-            .andExpect(jsonPath("$[0].capacidadMaxima").value(10))
+            .andExpect(jsonPath("$[0].name").value("Zona A"))
+            .andExpect(jsonPath("$[0].maxCapacity").value(10))
     }
 
     @Test
-    fun `GET estadisticas responde 200 sin token por ser publico`() {
+    fun `GET zonas sin token responde 401`() {
+        mockMvc.perform(get("/api/v1/zonas"))
+            .andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `GET estadisticas con token responde 200`() {
         val estadisticas = EstadisticasZonaResponse(
-            zonaId = 1L, zonaNombre = "Zona A", capacidadMaxima = 10,
-            disponibles = 7L, ocupados = 3L, total = 10L
+            zoneId = 1L, zoneName = "Zona A", maxCapacity = 10,
+            available = 7L, occupied = 3L, total = 10L
         )
         whenever(zonaParqueoService.getEstadisticas(1L)).thenReturn(estadisticas)
 
-        mockMvc.perform(get("/api/v1/zonas/1/estadisticas"))
+        mockMvc.perform(get("/api/v1/zonas/1/estadisticas").with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER"))))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.disponibles").value(7))
-            .andExpect(jsonPath("$.ocupados").value(3))
+            .andExpect(jsonPath("$.available").value(7))
+            .andExpect(jsonPath("$.occupied").value(3))
     }
 
     @Test
@@ -61,7 +70,7 @@ class ZonaParqueoControllerTest {
         whenever(zonaParqueoService.getEstadisticas(99L))
             .thenAnswer { throw ZonaParqueoNotFoundException("Zona 99 no encontrada") }
 
-        mockMvc.perform(get("/api/v1/zonas/99/estadisticas"))
+        mockMvc.perform(get("/api/v1/zonas/99/estadisticas").with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER"))))
             .andExpect(status().isNotFound)
     }
 
@@ -70,7 +79,7 @@ class ZonaParqueoControllerTest {
         mockMvc.perform(
             post("/api/v1/zonas")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"nombre":"Zona B","capacidadMaxima":5}""")
+                .content(zonaBody)
         ).andExpect(status().isUnauthorized)
     }
 
@@ -80,7 +89,7 @@ class ZonaParqueoControllerTest {
             post("/api/v1/zonas")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"nombre":"Zona B","capacidadMaxima":5}""")
+                .content(zonaBody)
         ).andExpect(status().isForbidden)
     }
 
@@ -92,9 +101,9 @@ class ZonaParqueoControllerTest {
             post("/api/v1/zonas")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"nombre":"Zona A","capacidadMaxima":10}""")
+                .content(zonaBody)
         ).andExpect(status().isCreated)
-            .andExpect(jsonPath("$.nombre").value("Zona A"))
+            .andExpect(jsonPath("$.name").value("Zona A"))
     }
 
     @Test
@@ -106,20 +115,20 @@ class ZonaParqueoControllerTest {
             post("/api/v1/zonas")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"nombre":"Zona A","capacidadMaxima":10}""")
+                .content(zonaBody)
         ).andExpect(status().isConflict)
     }
 
     @Test
     fun `POST zonas con nombre blank responde 400`() {
         whenever(zonaParqueoService.createZona(any()))
-            .thenAnswer { throw BlankFieldException("nombre no puede estar vacío") }
+            .thenAnswer { throw BlankFieldException("name no puede estar vacío") }
 
         mockMvc.perform(
             post("/api/v1/zonas")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"nombre":"","capacidadMaxima":10}""")
+                .content("""{"name":"","maxCapacity":10}""")
         ).andExpect(status().isBadRequest)
     }
 
@@ -128,7 +137,7 @@ class ZonaParqueoControllerTest {
         mockMvc.perform(
             put("/api/v1/zonas/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"nombre":"Zona A","capacidadMaxima":10}""")
+                .content(zonaBody)
         ).andExpect(status().isUnauthorized)
     }
 
@@ -140,7 +149,7 @@ class ZonaParqueoControllerTest {
             put("/api/v1/zonas/1")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"nombre":"Zona A","capacidadMaxima":10}""")
+                .content(zonaBody)
         ).andExpect(status().isOk)
     }
 
