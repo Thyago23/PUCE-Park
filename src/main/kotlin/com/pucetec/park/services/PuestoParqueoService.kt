@@ -7,7 +7,6 @@ import com.pucetec.park.exceptions.*
 import com.pucetec.park.mappers.toEntity
 import com.pucetec.park.mappers.toResponse
 import com.pucetec.park.repositories.HistorialParqueoRepository
-import com.pucetec.park.repositories.PerfilUsuarioRepository
 import com.pucetec.park.repositories.PuestoParqueoRepository
 import com.pucetec.park.repositories.ZonaParqueoRepository
 import org.slf4j.LoggerFactory
@@ -21,7 +20,6 @@ class PuestoParqueoService(
     private val puestoParqueoRepository: PuestoParqueoRepository,
     private val zonaParqueoRepository: ZonaParqueoRepository,
     private val historialParqueoRepository: HistorialParqueoRepository,
-    private val perfilUsuarioRepository: PerfilUsuarioRepository
 ) {
     private val logger = LoggerFactory.getLogger(PuestoParqueoService::class.java)
 
@@ -85,12 +83,8 @@ class PuestoParqueoService(
     @Transactional
     fun ocuparPuesto(id: Long, username: String): PuestoParqueoResponse {
         logger.info("User '$username' is requesting to occupy parking space id=$id...")
-        logger.info("Loading user profile for '$username' to verify completeness...")
-        val perfil = perfilUsuarioRepository.findByUsername(username).orElse(null)
-        if (perfil == null || perfil.placaVehiculo.isBlank() || perfil.nombreCompleto.isBlank() || perfil.numeroPermiso.isNullOrBlank()) {
-            logger.warn("User '$username' profile is incomplete. Cannot occupy space id=$id.")
-            throw PerfilIncompletoException("You must complete your profile (fullName, vehiclePlate and permitNumber) before occupying a space")
-        }
+        // El perfil vive en el microservicio 'users-service' (patrón sin llamadas entre servicios).
+        // El cliente (iOS) obliga a completar el perfil en el onboarding antes de permitir ocupar.
         logger.info("Checking if user '$username' already has an active space...")
         if (historialParqueoRepository.existsByUsernameAndFechaSalidaIsNull(username)) {
             logger.warn("User '$username' already has an active parking space. Cannot occupy another.")

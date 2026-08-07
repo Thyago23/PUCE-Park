@@ -33,9 +33,9 @@ class UserProfileService(private val userProfileRepository: UserProfileRepositor
         return if (profile.isPresent) {
             val p = profile.get()
             val complete = p.fullName.isNotBlank() && (p.vehiclePlate.isNotBlank() || !p.permitNumber.isNullOrBlank())
-            ProfileStatusResponse(complete = complete, username = p.username)
+            ProfileStatusResponse(complete = complete, username = p.username, missing = missingFields(p))
         } else {
-            ProfileStatusResponse(complete = false, username = username)
+            ProfileStatusResponse(complete = false, username = username, missing = listOf("fullName", "vehiclePlate", "permitNumber"))
         }
     }
 
@@ -47,6 +47,13 @@ class UserProfileService(private val userProfileRepository: UserProfileRepositor
         profile.fullName = request.fullName
         profile.vehiclePlate = request.vehiclePlate
         profile.permitNumber = request.permitNumber
+        profile.darkMode = request.darkMode
         return userProfileRepository.save(profile).toResponse()
+    }
+
+    private fun missingFields(p: UserProfile): List<String> = buildList {
+        if (p.fullName.isBlank()) add("fullName")
+        if (p.vehiclePlate.isBlank()) add("vehiclePlate")
+        if (p.permitNumber.isNullOrBlank()) add("permitNumber")
     }
 }

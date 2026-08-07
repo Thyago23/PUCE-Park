@@ -9,6 +9,7 @@ fun UserProfile.toResponse() = UserProfileResponse(
     username = username,
     fullName = fullName,
     vehiclePlate = vehiclePlate,
-    permitNumber = permitNumber,
+    permitNumber = permitNumber ?: "",
+    darkMode = darkMode,
     complete = fullName.isNotBlank() && (vehiclePlate.isNotBlank() || !permitNumber.isNullOrBlank()),
 )

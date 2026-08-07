@@ -70,11 +70,6 @@ class GlobalExceptionHandler {
         ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ExceptionResponse(e.message ?: "Capacidad inválida", "ZonaParqueoService"))
 
-    @ExceptionHandler(PerfilIncompletoException::class)
-    fun handlePerfilIncompleto(e: PerfilIncompletoException): ResponseEntity<ExceptionResponse> =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ExceptionResponse(e.message ?: "Perfil incompleto", "PerfilUsuarioService"))
-
     @ExceptionHandler(UserAlreadyOccupyingException::class)
     fun handleUserAlreadyOccupying(e: UserAlreadyOccupyingException): ResponseEntity<ExceptionResponse> =
         ResponseEntity.status(HttpStatus.CONFLICT)
