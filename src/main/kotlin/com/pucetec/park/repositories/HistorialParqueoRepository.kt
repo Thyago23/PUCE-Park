@@ -44,7 +44,7 @@ interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
     // compartida ni joins entre servicios); el ranking usa solo el username.
     @Query(value = """
         SELECT h.username as username,
-               h.username as nombre_completo,
+               COALESCE(MAX(h.display_name), h.username) as nombre_completo,
                COALESCE(SUM(EXTRACT(EPOCH FROM (h.exit_date - h.entry_date)) / 3600.0), 0) as total_horas,
                COUNT(h.id) as total_sesiones
         FROM parking_history h

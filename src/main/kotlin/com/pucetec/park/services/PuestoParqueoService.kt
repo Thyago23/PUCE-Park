@@ -81,7 +81,7 @@ class PuestoParqueoService(
     }
 
     @Transactional
-    fun ocuparPuesto(id: Long, username: String): PuestoParqueoResponse {
+    fun ocuparPuesto(id: Long, username: String, displayName: String? = null): PuestoParqueoResponse {
         logger.info("User '$username' is requesting to occupy parking space id=$id...")
         // El perfil vive en el microservicio 'users-service' (patrón sin llamadas entre servicios).
         // El cliente (iOS) obliga a completar el perfil en el onboarding antes de permitir ocupar.
@@ -102,7 +102,7 @@ class PuestoParqueoService(
         puestoParqueoRepository.save(puesto)
         val codigoTicket = "PARK-" + UUID.randomUUID().toString().replace("-", "").take(8).uppercase()
         logger.info("Saving parking history entry for user '$username', space id=$id, ticket='$codigoTicket'...")
-        historialParqueoRepository.save(HistorialParqueo(puesto = puesto, username = username, codigoTicket = codigoTicket))
+        historialParqueoRepository.save(HistorialParqueo(puesto = puesto, username = username, codigoTicket = codigoTicket, nombreMostrar = displayName))
         logger.info("Parking space id=$id successfully occupied by '$username'. Ticket: $codigoTicket.")
         return puesto.toResponse()
     }

@@ -17,6 +17,12 @@ data class ForzarOcupacionRequest(
     val vehiclePlate: String
 )
 
+// El cliente envía su nombre (que vive en users-service) para denormalizarlo en el
+// historial y poder mostrarlo en el ranking sin joins entre servicios.
+data class OcuparPuestoRequest(
+    val fullName: String? = null
+)
+
 data class PuestoParqueoResponse(
     val id: Long,
     val spaceNumber: String,
