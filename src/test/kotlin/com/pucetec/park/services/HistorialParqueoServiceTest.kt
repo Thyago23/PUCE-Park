@@ -44,7 +44,7 @@ class HistorialParqueoServiceTest {
         val result = historialParqueoService.getHistorialByPuesto(1L)
 
         assertEquals(1, result.size)
-        assertEquals("A01", result[0].puesto.numeroPuesto)
+        assertEquals("A01", result[0].space.spaceNumber)
     }
 
     @Test

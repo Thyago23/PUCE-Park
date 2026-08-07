@@ -31,13 +31,18 @@ class HistorialParqueoControllerTest {
     @MockitoBean private lateinit var historialParqueoService: HistorialParqueoService
     @MockitoBean private lateinit var jwtDecoder: JwtDecoder
 
-    private val zonaResponse = ZonaParqueoResponse(id = 1L, nombre = "Zona A", descripcion = "", capacidadMaxima = 10)
-    private val puestoResponse = PuestoParqueoResponse(id = 1L, numeroPuesto = "A01", estado = EstadoPuesto.DISPONIBLE, zona = zonaResponse)
+    private val zonaResponse = ZonaParqueoResponse(
+        id = 1L, name = "Zona A", description = "", location = "", maxCapacity = 10,
+        availableSpaces = 9, occupiedSpaces = 1, totalSpaces = 10
+    )
+    private val puestoResponse = PuestoParqueoResponse(
+        id = 1L, spaceNumber = "A01", row = "A", order = 1,
+        status = EstadoPuesto.DISPONIBLE, zone = zonaResponse
+    )
     private val historialResponse = HistorialParqueoResponse(
-        id = 1L, username = "jdoe",
-        fechaIngreso = LocalDateTime.of(2026, 7, 1, 10, 0),
-        fechaSalida = null,
-        puesto = puestoResponse
+        id = 1L, ticketCode = "PARK-ABC123", username = "jdoe",
+        entryDate = LocalDateTime.of(2026, 7, 1, 10, 0),
+        exitDate = null, vehiclePlate = null, space = puestoResponse
     )
 
     @Test
@@ -47,20 +52,20 @@ class HistorialParqueoControllerTest {
     }
 
     @Test
-    fun `GET historial me con rol ADMIN responde 403`() {
+    fun `GET historial me con rol GUARD responde 403`() {
         mockMvc.perform(
             get("/api/v1/historial/me")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_ADMIN")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_GUARD")))
         ).andExpect(status().isForbidden)
     }
 
     @Test
-    fun `GET historial me con rol DRIVER responde 200`() {
+    fun `GET historial me con rol USER responde 200`() {
         whenever(historialParqueoService.getHistorialByUsername(any())).thenReturn(listOf(historialResponse))
 
         mockMvc.perform(
             get("/api/v1/historial/me")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$[0].username").value("jdoe"))
     }
@@ -72,10 +77,10 @@ class HistorialParqueoControllerTest {
     }
 
     @Test
-    fun `GET historial puesto con rol DRIVER responde 403`() {
+    fun `GET historial puesto con rol USER responde 403`() {
         mockMvc.perform(
             get("/api/v1/historial/puesto/1")
-                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_DRIVER")))
+                .with(jwt().authorities(SimpleGrantedAuthority("ROLE_USER")))
         ).andExpect(status().isForbidden)
     }
 
@@ -87,7 +92,7 @@ class HistorialParqueoControllerTest {
             get("/api/v1/historial/puesto/1")
                 .with(jwt().authorities(SimpleGrantedAuthority("ROLE_GUARD")))
         ).andExpect(status().isOk)
-            .andExpect(jsonPath("$[0].puesto.numeroPuesto").value("A01"))
+            .andExpect(jsonPath("$[0].space.spaceNumber").value("A01"))
     }
 
     @Test
