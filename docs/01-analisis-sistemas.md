@@ -60,26 +60,40 @@ El equipo gestiona el código en **GitHub** con un flujo basado en ramas + Pull 
 - Backend (microservicios): `github.com/Thyago23/ae_2026_01_Taco_Cede-o_1462_PucePark`
 - Frontend (app iOS): `github.com/BryanTaco/PuceParkFront`
 
-**Estrategia de ramas:**
-- **`main`** — rama estable y siempre desplegable; no se hace *push* directo de cambios grandes.
-- **Ramas de trabajo** — una por funcionalidad o corrección, con prefijo según el tipo:
-  - `feat/...` (nuevas funciones)
-  - `fix/...` (correcciones)
-  - `refactor/...` (reestructuración) — ej. `refactor/perfiles-en-microservicio`
+Se aplica el modelo **GitFlow clásico** (Vincent Driessen), el mismo enseñado en clase con el proyecto de referencia *Micromercado*.
 
-**Flujo de integración (Pull Request):**
-1. Se crea una rama desde `main`.
-2. Se desarrolla y se hacen *commits* con prefijos convencionales (`feat:`, `fix:`, `refactor:`).
-3. Se sube la rama a GitHub (`git push -u origin <rama>`).
-4. Se abre un **Pull Request** hacia `main` con descripción del cambio.
-5. Se revisa y se **mergea** a `main`; `main` queda actualizado y desplegable.
+**Ramas de larga vida:**
+- **`main`** — código en producción; solo recibe versiones estables (merges de `release/*` o `hotfix/*`).
+- **`develop`** — rama de integración; acumula las funcionalidades terminadas antes de una versión.
 
-**Convención de commits:** mensajes descriptivos en español con prefijo de tipo y co-autoría del equipo (`Co-Authored-By`).
+**Ramas de apoyo (temporales):**
+- **`feature/HU-NN-descripcion`** — una por Historia de Usuario; nace de `develop` y regresa a `develop` (ej. `feature/HU-06-ocupar-puesto`). *Convención tomada del ejemplo Micromercado (`feature/scrum-XX-HU-YY-...`).*
+- **`release/x.y`** — preparación de una versión; nace de `develop`, se prueba y se mergea a `main` **y** a `develop`.
+- **`hotfix/x.y.z`** — corrección urgente en producción; nace de `main` y regresa a `main` **y** a `develop`.
+
+**Flujo de una Historia de Usuario:**
+1. `git checkout develop && git pull`
+2. `git checkout -b feature/HU-NN-descripcion`
+3. Desarrollo + *commits* con prefijos convencionales (`feat:`, `fix:`, `refactor:`).
+4. `git push -u origin feature/HU-NN-descripcion`
+5. **Pull Request** hacia `develop`, revisión del equipo y *merge*.
+6. Al completar el alcance, `release/x.y` desde `develop` → `main` (despliegue).
+
+```
+main     ●───────────────────────────●─────►  (versiones estables)
+          \                         /
+develop    ●──●────●────●────●────●          (integración)
+               \   /     \    /
+feature         ●─●       ●──●               (HU-NN, nacen y vuelven a develop)
+```
+
+**Convención de commits:** mensajes en español con prefijo de tipo (`feat:`, `fix:`, `refactor:`, `docs:`) y co-autoría del equipo (`Co-Authored-By`).
 
 **Evidencia en GitHub:**
-- Rama `refactor/perfiles-en-microservicio` en ambos repos.
-- **PR #1** en backend y **PR #1** en frontend (refactor a microservicios: perfiles en `users-service`, ranking sin *joins* entre BDs, nginx con re-resolución), ambos **mergeados** a `main`.
-- Historial de commits con prefijos (`feat:`, `fix:`, `refactor:`) visible en cada repo.
+- Ambos repos tienen las ramas de larga vida **`main`** y **`develop`**.
+- Rama de HU: `feature/HU-01-documentacion-gitflow` → PR hacia `develop` (esta misma documentación).
+- Refactor a microservicios integrado por PR (perfiles en `users-service`, ranking sin *joins*, nginx con re-resolución).
+- Historial de *commits* con prefijos convencionales visible en cada repo.
 
 ## 5. Pruebas Unitarias (criterio 1.3)
 
