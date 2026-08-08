@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PucePark — Descargar la app</title>
+  <style>
+    :root{
+      --bg:#0B1120; --surface:#141E35; --card:#1C2A4A;
+      --accent:#2563EB; --accent2:#3B82F6; --green:#22C55E; --text:#fff; --muted:rgba(255,255,255,.6);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+    .hero{background:linear-gradient(160deg,#12233d 0%,#0B1120 70%);padding:56px 24px 40px;text-align:center;position:relative;overflow:hidden}
+    .hero::after{content:"PARK";position:absolute;right:-10px;top:10px;font-size:120px;font-weight:900;color:rgba(255,255,255,.04);letter-spacing:-6px}
+    .eyebrow{font-size:12px;letter-spacing:3px;color:var(--muted);font-weight:600}
+    .logo{width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,var(--accent),#0891B2);display:inline-flex;align-items:center;justify-content:center;font-size:38px;margin:18px 0 12px}
+    h1{font-size:40px;font-weight:800;letter-spacing:-1px}
+    h1 span{color:var(--accent2)}
+    .sub{color:var(--muted);margin-top:10px;font-size:16px;max-width:520px;margin-left:auto;margin-right:auto}
+    .stats{display:flex;gap:28px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+    .stat b{font-size:22px;color:var(--green)}.stat span{display:block;color:var(--muted);font-size:12px}
+    main{flex:1;max-width:820px;margin:0 auto;padding:36px 20px 60px;width:100%}
+    .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media(max-width:640px){.cards{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:26px 22px;text-align:center}
+    .card .os{font-size:44px}
+    .card h2{font-size:20px;margin:12px 0 4px}
+    .card p{color:var(--muted);font-size:13px;min-height:34px}
+    .btn{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 22px;border-radius:12px;transition:.15s;border:none;cursor:pointer}
+    .btn:hover{background:#1d4ed8}
+    .btn.ghost{background:transparent;border:1.5px solid var(--accent2);color:var(--accent2)}
+    .tag{display:inline-block;font-size:11px;color:var(--muted);margin-top:10px}
+    .note{background:var(--surface);border-left:4px solid #F59E0B;border-radius:10px;padding:14px 18px;margin-top:28px;color:#fde9c8;font-size:13px}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}
+    .steps{margin-top:34px;background:var(--surface);border-radius:14px;padding:22px 24px}
+    .steps h3{font-size:15px;margin-bottom:10px}
+    .steps ol{margin-left:18px;color:var(--muted);font-size:13px;line-height:1.9}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="eyebrow">PUCE · PARQUEO INTELIGENTE</div>
+    <div class="logo">🅿️</div>
+    <h1>Puce<span>Park</span></h1>
+    <p class="sub">Encuentra y reserva tu puesto de parqueo en el campus en tiempo real. Descarga la app para tu dispositivo.</p>
+    <div class="stats">
+      <div class="stat"><b>3</b><span>Zonas</span></div>
+      <div class="stat"><b>90</b><span>Puestos</span></div>
+      <div class="stat"><b>v1.0</b><span>Versión</span></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="cards">
+      <!-- Android -->
+      <div class="card">
+        <div class="os">🤖</div>
+        <h2>Android</h2>
+        <p>Instala el archivo APK en tu dispositivo Android.</p>
+        <a class="btn" href="PucePark.apk" download>⬇️ Descargar APK</a>
+        <div class="tag">PucePark.apk · Android 8.0+</div>
+      </div>
+      <!-- iOS -->
+      <div class="card">
+        <div class="os"></div>
+        <h2>iOS</h2>
+        <p>Compilación para iPhone (distribución simulada — normalmente vía App Store / TestFlight).</p>
+        <a class="btn ghost" href="PucePark.ipa" download>⬇️ Descargar iOS (simulado)</a>
+        <div class="tag">PucePark.ipa · iOS 17+</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Nota (simulación):</strong> en iOS las apps no se instalan por archivo libre como el APK de Android;
+      se distribuyen por la App Store o TestFlight. Aquí se ofrece el paquete como <em>simulación</em> del flujo de descarga.
+    </div>
+
+    <div class="steps">
+      <h3>Cómo instalar el APK (Android)</h3>
+      <ol>
+        <li>Descarga <b>PucePark.apk</b> desde el botón de arriba.</li>
+        <li>Abre el archivo; permite "Instalar apps de orígenes desconocidos" si te lo pide.</li>
+        <li>Confirma la instalación y abre PucePark.</li>
+        <li>Inicia sesión con tu cuenta PUCE.</li>
+      </ol>
+    </div>
+  </main>
+
+  <footer>© 2026 PucePark · PUCE TEC · Proyecto Integrador</footer>
+</body>
+</html>
