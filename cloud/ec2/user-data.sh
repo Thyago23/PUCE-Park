@@ -21,6 +21,13 @@ curl -SL https://github.com/docker/compose/releases/latest/download/docker-compo
   -o "$DOCKER_CONFIG/cli-plugins/docker-compose"
 chmod +x "$DOCKER_CONFIG/cli-plugins/docker-compose"
 
+# 3b) Buildx (docker compose build lo requiere >= 0.17; el de AL2023 es viejo/ausente)
+BVER=$(curl -fsSL https://api.github.com/repos/docker/buildx/releases/latest | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4)
+[ -z "$BVER" ] && BVER=v0.19.3
+curl -SL "https://github.com/docker/buildx/releases/download/${BVER}/buildx-${BVER}.linux-amd64" \
+  -o "$DOCKER_CONFIG/cli-plugins/docker-buildx"
+chmod +x "$DOCKER_CONFIG/cli-plugins/docker-buildx"
+
 # 4) Swap de 2 GB (la build de Gradle necesita RAM; útil en instancias pequeñas)
 if [ ! -f /swapfile ]; then
   dd if=/dev/zero of=/swapfile bs=1M count=2048
