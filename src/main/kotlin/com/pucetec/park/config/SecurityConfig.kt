@@ -22,6 +22,8 @@ class SecurityConfig {
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
+                // Health check público (para el healthcheck de Docker / balanceador)
+                auth.requestMatchers("/actuator/health").permitAll()
                 // Zonas
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/zonas", "/api/v1/zonas/*/estadisticas").hasAnyRole("ADMIN", "GUARD", "USER")
                 auth.requestMatchers(HttpMethod.POST, "/api/v1/zonas").hasRole("ADMIN")
