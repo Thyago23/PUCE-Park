@@ -2,7 +2,7 @@
 
 **Proyecto Integrador P02 · PUCE TEC**
 
-> ⚠️ **Nota**: las cifras financieras y de mercado son **estimaciones** para el ejercicio. Ajústalas con datos reales de tu institución (número de plazas, matrícula, tarifas) antes de la sustentación.
+> Cifras del modelo de negocio estimadas para el contexto PUCE (piloto: 1 campus, operación en la nube, equipo reducido). Moneda: USD.
 
 ---
 
