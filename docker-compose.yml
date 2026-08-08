@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
 
   # ── Base de datos 1: Parqueo principal ────────────────────────────────────────
@@ -7,8 +5,8 @@ services:
     image: postgres:16-alpine
     container_name: puce_park_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PARK_PASSWORD:-password}
       POSTGRES_DB: puce_park
     ports:
       - "5434:5432"
@@ -18,7 +16,7 @@ services:
       - park_net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d puce_park"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d puce_park"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,8 +26,8 @@ services:
     image: postgres:16-alpine
     container_name: puce_micro_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_MICRO_PASSWORD:-password}
       POSTGRES_DB: puce_micro
     ports:
       - "5435:5432"
@@ -39,7 +37,7 @@ services:
       - park_net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d puce_micro"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d puce_micro"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -51,14 +49,20 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_park:5432/puce_park
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PARK_PASSWORD:-password}
     depends_on:
       db_park:
         condition: service_healthy
     networks:
       - park_net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
 
   # ── Microservicio: Usuarios / Perfiles ────────────────────────────────────────
   users-service:
@@ -67,14 +71,20 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_micro:5432/puce_micro
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_MICRO_PASSWORD:-password}
     depends_on:
       db_micro:
         condition: service_healthy
     networks:
       - park_net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8686/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
 
   # ── Nginx: reverse proxy ──────────────────────────────────────────────────────
   nginx:
