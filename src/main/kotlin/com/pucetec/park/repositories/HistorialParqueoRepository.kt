@@ -53,7 +53,7 @@ interface HistorialParqueoRepository : JpaRepository<HistorialParqueo, Long> {
           AND EXTRACT(YEAR FROM h.entry_date) = :year
           AND EXTRACT(MONTH FROM h.entry_date) = :month
         GROUP BY h.username
-        ORDER BY total_horas DESC
+        ORDER BY total_horas DESC, total_sesiones DESC, h.username ASC
         LIMIT 20
     """, nativeQuery = true)
     fun getRankingMensual(
